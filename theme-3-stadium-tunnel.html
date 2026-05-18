@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOO CLOSE TO CALL — Theme 3: Stadium Tunnel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f; --ink:#ffffff; --mute:#9a9aa2;
+    --accent:#ff2d2d; --chalk:#f2f0e6;
+    --display:'Anton',sans-serif; --cond:'Barlow Condensed',sans-serif;
+    --body:'Barlow',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow-x:hidden}
+
+  /* hero — tunnel */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:0 6vw;position:relative;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.25),transparent 70%),
+      repeating-linear-gradient(90deg,transparent 0 11.1%,rgba(255,255,255,.04) 11.1% 11.2%);}
+  .hero::before{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,#000 0%,transparent 22%,transparent 78%,#000 100%)}
+  .hero::after{content:"01 / 03";position:absolute;top:32px;right:6vw;
+    font-family:var(--cond);font-size:15px;letter-spacing:.3em;color:var(--mute)}
+  .h-kick{font-family:var(--cond);font-size:clamp(14px,1.6vw,18px);font-weight:600;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:18px;position:relative}
+  .h-title{font-family:var(--display);font-size:clamp(80px,17vw,250px);
+    line-height:.82;letter-spacing:.005em;text-transform:uppercase;position:relative;
+    text-shadow:0 0 60px rgba(255,45,45,.3)}
+  .h-title span{display:block}
+  .h-title .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .h-sub{margin-top:30px;font-family:var(--cond);font-size:clamp(18px,2.4vw,26px);
+    font-weight:500;color:var(--chalk);max-width:600px;position:relative;line-height:1.3}
+  .h-lock{margin-top:34px;display:flex;gap:10px;flex-wrap:wrap;position:relative}
+  .chip{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.14em;
+    text-transform:uppercase;padding:9px 16px;border:1.5px solid #2a2a30;color:var(--mute)}
+  .chip b{color:var(--ink)}
+  .scroll-cue{position:absolute;bottom:30px;left:6vw;font-family:var(--cond);
+    font-size:13px;letter-spacing:.24em;color:var(--mute);text-transform:uppercase}
+
+  section{padding:9vh 6vw;position:relative}
+  .s-num{font-family:var(--display);font-size:clamp(60px,9vw,130px);
+    color:transparent;-webkit-text-stroke:1.5px #2a2a30;line-height:.8;
+    margin-bottom:-10px}
+  .s-head{font-family:var(--display);font-size:clamp(38px,6vw,82px);
+    line-height:.92;text-transform:uppercase;letter-spacing:.01em;margin-bottom:22px}
+  .s-head .red{color:var(--accent)}
+  .s-text{font-family:var(--cond);font-size:clamp(17px,2vw,22px);font-weight:500;
+    color:var(--mute);max-width:620px;line-height:1.4}
+
+  /* trigger — scoreboard style */
+  .board{display:flex;align-items:stretch;gap:0;margin-top:36px;
+    border:2px solid var(--ink);max-width:880px}
+  .board > div{flex:1;padding:30px 24px;text-align:center;
+    border-right:2px solid var(--ink)}
+  .board > div:last-child{border-right:0;background:var(--accent)}
+  .b-k{font-family:var(--cond);font-size:14px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+  .board > div:last-child .b-k{color:#000}
+  .b-v{font-family:var(--display);font-size:clamp(24px,3.4vw,42px);
+    text-transform:uppercase;line-height:.95}
+  .b-plus{display:flex;align-items:center;font-family:var(--display);
+    font-size:40px;padding:0 6px;flex:0}
+
+  /* CTV mockups — jumbotron grid */
+  .sport-tab{font-family:var(--display);font-size:clamp(22px,3vw,38px);
+    text-transform:uppercase;margin:54px 0 20px;display:flex;align-items:center;gap:14px}
+  .sport-tab::after{content:"";flex:1;height:3px;background:var(--accent)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .jumbo{position:relative}
+  .jumbo .lab{font-family:var(--cond);font-size:12px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+  .tv{aspect-ratio:16/9;background:#000;border:3px solid #1c1c22;border-radius:5px;
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+    justify-content:flex-end;box-shadow:0 0 0 1px #000,0 18px 40px -14px rgba(255,45,45,.35)}
+  .tv::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 130%,rgba(255,45,45,.4),transparent 62%)}
+  .tv::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 4px)}
+  .tv-tag{position:absolute;top:9px;left:11px;font-family:var(--cond);
+    font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--mute)}
+  .tv-flag{position:absolute;top:9px;right:11px;font-family:var(--cond);
+    font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent)}
+  .tv-in{position:relative;z-index:2;padding:16px 15px 13px}
+  .tv-take{font-family:var(--display);font-size:clamp(16px,2.5vw,23px);
+    line-height:.98;text-transform:uppercase;letter-spacing:.01em}
+  .tv-step{font-family:var(--cond);font-size:11px;font-weight:600;
+    color:var(--accent);margin-top:10px;letter-spacing:.04em;text-transform:uppercase}
+  .tv-end{font-family:var(--display);font-size:14px;margin-top:4px;
+    text-transform:uppercase;letter-spacing:.02em}
+  .jumbo .route{font-family:var(--cond);font-size:13px;font-weight:500;
+    color:var(--mute);margin-top:10px;line-height:1.35}
+  .jumbo .route b{color:var(--chalk);font-weight:700}
+
+  footer{padding:7vh 6vw;font-family:var(--cond);font-size:13px;font-weight:600;
+    letter-spacing:.2em;text-transform:uppercase;color:var(--mute);
+    border-top:2px solid #1c1c22}
+  @media(max-width:820px){
+    .board{flex-direction:column}.b-plus{padding:8px 0;justify-content:center}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="h-kick">Concept 01 — Google Search · AI Mode × NBCU CTV</div>
+  <h1 class="h-title">
+    <span>Too Close</span>
+    <span class="out">To Call</span>
+  </h1>
+  <p class="h-sub">The booth can't call it. The room won't let it go.
+    That's the opening — and Google takes it.</p>
+  <div class="h-lock">
+    <span class="chip">STEP-UP · <b>"Too close to call? Call it."</b></span>
+    <span class="chip">ENDLINE · <b>Search on.</b></span>
+    <span class="chip">RUN · <b>Q3–Q4 2026</b></span>
+  </div>
+  <div class="scroll-cue">↓ Scroll — Run it back</div>
+</div>
+
+<section>
+  <div class="s-num">01</div>
+  <h2 class="s-head">When it's <span class="red">close,</span><br>the couch gets loud</h2>
+  <p class="s-text">College football fandom isn't a hobby — it's a rivalry older
+    and nastier than the pros will ever be. A tight game doesn't just hold
+    attention. It starts a fight. And every fight needs a referee.</p>
+</section>
+
+<section>
+  <div class="s-num">02</div>
+  <h2 class="s-head">The signal reads<br>the <span class="red">game-state</span></h2>
+  <p class="s-text">NBCU's ACR/OCR feed watches the broadcast and waits for two
+    things to be true. No play-by-play sprint — a sustained state. When both
+    light up, the CTV ad serves on the same screen.</p>
+  <div class="board">
+    <div><div class="b-k">Condition 1</div><div class="b-v">Close</div></div>
+    <div class="b-plus">+</div>
+    <div><div class="b-k">Condition 2</div><div class="b-v">Late</div></div>
+    <div class="b-plus">=</div>
+    <div><div class="b-k">Result</div><div class="b-v">Search<br>On</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="s-num">03</div>
+  <h2 class="s-head">The spot drops<br>a <span class="red">take</span></h2>
+  <p class="s-text">One evergreen provocation, aimed at the situation — never the
+    fan's team. They disagree, or they wonder. Either way, the thumb is moving.</p>
+
+  <div class="sport-tab">College Football · Launch</div>
+  <div class="grid">
+    <div class="jumbo">
+      <div class="lab">Mockup A · 15s</div>
+      <div class="tv">
+        <span class="tv-tag">Contextual CTV</span><span class="tv-flag">●Too Close</span>
+        <div class="tv-in">
+          <div class="tv-take">The wrong guy has the ball right now.</div>
+          <div class="tv-step">Too close to call? Call it.</div>
+          <div class="tv-end">Search on.</div>
+        </div>
+      </div>
+      <div class="route"><b>4th Q · one-score.</b> → "ball or lead late?"</div>
+    </div>
+    <div class="jumbo">
+      <div class="lab">Mockup B · 15s</div>
+      <div class="tv">
+        <span class="tv-tag">Contextual CTV</span><span class="tv-flag">●Too Close</span>
+        <div class="tv-in">
+          <div class="tv-take">That punt was a coward's punt.</div>
+          <div class="tv-step">Too close to call? Call it.</div>
+          <div class="tv-end">Search on.</div>
+        </div>
+      </div>
+      <div class="route"><b>Halftime · close.</b> → "punt or go for it?"</div>
+    </div>
+    <div class="jumbo">
+      <div class="lab">Mockup C · 15s</div>
+      <div class="tv">
+        <span class="tv-tag">Contextual CTV</span><span class="tv-flag">●Too Close</span>
+        <div class="tv-in">
+          <div class="tv-take">This result just blew up the rankings.</div>
+          <div class="tv-step">Too close to call? Call it.</div>
+          <div class="tv-end">Search on.</div>
+        </div>
+      </div>
+      <div class="route"><b>4th Q · ranked upset.</b> → "Playoff impact?"</div>
+    </div>
+  </div>
+
+  <div class="sport-tab">NBA · Q4 Expansion</div>
+  <div class="grid">
+    <div class="jumbo">
+      <div class="lab">Mockup D · 15s</div>
+      <div class="tv">
+        <span class="tv-tag">Contextual CTV</span><span class="tv-flag">●Too Close</span>
+        <div class="tv-in">
+          <div class="tv-take">Your star hasn't shot in 8 minutes.</div>
+          <div class="tv-step">Too close to call? Call it.</div>
+          <div class="tv-end">Search on.</div>
+        </div>
+      </div>
+      <div class="route"><b>4th Q · within 5.</b> → "who decides crunch time?"</div>
+    </div>
+    <div class="jumbo">
+      <div class="lab">Mockup E · 15s</div>
+      <div class="tv">
+        <span class="tv-tag">Contextual CTV</span><span class="tv-flag">●Too Close</span>
+        <div class="tv-in">
+          <div class="tv-take">That timeout came too late.</div>
+          <div class="tv-step">Too close to call? Call it.</div>
+          <div class="tv-end">Search on.</div>
+        </div>
+      </div>
+      <div class="route"><b>Final 2 min · close.</b> → "clock management late?"</div>
+    </div>
+    <div class="jumbo">
+      <div class="lab">Mockup F · 15s</div>
+      <div class="tv">
+        <span class="tv-tag">Contextual CTV</span><span class="tv-flag">●Too Close</span>
+        <div class="tv-in">
+          <div class="tv-take">One team isn't winning. One is choking.</div>
+          <div class="tv-step">Too close to call? Call it.</div>
+          <div class="tv-end">Search on.</div>
+        </div>
+      </div>
+      <div class="route"><b>4th Q · lead shrinking.</b> → "why teams collapse?"</div>
+    </div>
+  </div>
+</section>
+
+<footer>Too Close To Call — Concept 01 / 03 — Theme: Stadium Tunnel</footer>
+</body>
+</html>
