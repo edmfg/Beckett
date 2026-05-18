@@ -221,46 +221,99 @@ section{padding:9vh 6vw;position:relative}
   aspect-ratio:16/9;background:#000;
   border:3px solid var(--line);border-radius:5px;
   position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;
   box-shadow:
     0 0 0 1px #000,
     0 18px 40px -14px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 .tv::before{
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 130%,
-    color-mix(in srgb, var(--accent) 45%, transparent),transparent 62%);
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      color-mix(in srgb, var(--accent) 35%, transparent),transparent 65%),
+    radial-gradient(ellipse at 50% 0%,
+      rgba(255,255,255,.06),transparent 60%);
 }
 .tv::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,
-    rgba(0,0,0,.18) 0 2px,transparent 2px 4px);
+    rgba(0,0,0,.16) 0 2px,transparent 2px 4px);
 }
+
+/* Chyron-style indicators in the corners — sell "this is a live broadcast" */
 .tv-tag{
-  position:absolute;top:9px;left:11px;
+  position:absolute;top:10px;left:12px;z-index:3;
   font-family:var(--cond);font-size:9px;font-weight:600;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--mute);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--mute);
 }
 .tv-flag{
-  position:absolute;top:9px;right:11px;
+  position:absolute;top:10px;right:12px;z-index:3;
   font-family:var(--cond);font-size:9px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+  letter-spacing:.14em;text-transform:uppercase;color:var(--accent);
+  display:inline-flex;align-items:center;gap:6px;
 }
-.tv-in{position:relative;z-index:2;padding:16px 15px 13px}
-.tv-take{
+.tv-flag::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse{50%{opacity:.5}}
+
+/* TV interior — prompt is the hero */
+.tv-in{
+  position:absolute;inset:0;z-index:2;
+  padding:32px 18px 14px;
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  gap:8px;
+}
+.tv-kicker{
+  font-family:var(--cond);
+  font-size:clamp(10px,1.2vw,13px);
+  font-weight:500;font-style:italic;
+  color:var(--mute);
+  line-height:1.25;
+  letter-spacing:.01em;
+  max-width:88%;
+}
+.tv-prompt-block{
+  display:flex;flex-direction:column;gap:6px;
+}
+.tv-prompt-label{
+  font-family:var(--cond);font-size:9px;font-weight:700;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--accent);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.tv-prompt-label::before{
+  content:"";width:5px;height:5px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 6px var(--accent);
+}
+.tv-prompt{
   font-family:var(--display);
-  font-size:clamp(15px,2.3vw,22px);
-  line-height:.98;text-transform:uppercase;letter-spacing:.01em;
+  font-size:clamp(17px,2.5vw,27px);
+  text-transform:uppercase;letter-spacing:.005em;
+  line-height:.98;
+  color:var(--ink);
+  text-wrap:balance;
+}
+.tv-end-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;flex-wrap:wrap;
+  border-top:1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  padding-top:8px;
+  margin-top:2px;
 }
 .tv-step{
-  font-family:var(--cond);font-size:11px;font-weight:600;
-  color:var(--accent);margin-top:10px;
-  letter-spacing:.04em;text-transform:uppercase;
+  font-family:var(--cond);font-size:10px;font-weight:600;
+  color:var(--mute);letter-spacing:.06em;text-transform:uppercase;
 }
 .tv-end{
-  font-family:var(--display);font-size:14px;margin-top:4px;
-  text-transform:uppercase;letter-spacing:.02em;
+  font-family:var(--display);font-size:12px;
+  text-transform:uppercase;letter-spacing:.03em;
+  color:var(--accent);
 }
+.tv-end::after{content:" ▸";color:var(--accent)}
 
 /* Visualize caption + AI Mode prompt under each mockup */
 .jumbo .viz{
