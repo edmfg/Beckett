@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="leather" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a4a1e"/>
+      <stop offset="55%" stop-color="#5a2f12"/>
+      <stop offset="100%" stop-color="#3a1d07"/>
+    </linearGradient>
+  </defs>
+  <g transform="rotate(-30 32 32)">
+    <ellipse cx="32" cy="32" rx="26" ry="14" fill="url(#leather)" stroke="#2a1305" stroke-width="2"/>
+    <path d="M10 32 Q32 22 54 32" fill="none" stroke="#2a1305" stroke-width="1" opacity="0.45"/>
+    <path d="M10 32 Q32 42 54 32" fill="none" stroke="#2a1305" stroke-width="1" opacity="0.45"/>
+    <path d="M22 32 L42 32" stroke="#f6efe2" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M25 28 L25 36 M29 28 L29 36 M33 28 L33 36 M37 28 L37 36" stroke="#f6efe2" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+</svg>
