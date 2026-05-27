@@ -107,23 +107,91 @@ async function callGemini(key, friendB64, memeB64, prompt) {
   };
 }
 
+// storyboard frame prompts — shared across all combos, used to make
+// step 3 look like an actual ad instead of CSS mockup cards
+const FRAME_PROMPTS = {
+  'couch': [
+    `Photorealistic 16:9 wide shot of a young white man (the person in the attached reference photo, with short brown hair) sitting comfortably on a tan leather couch in a cozy modern living room on a Saturday afternoon.`,
+    `He is wearing a Tennessee Volunteers orange hoodie or t-shirt. A 65-inch flat-screen TV is mounted on the wall in front of him, the screen visibly showing a live Tennessee vs Alabama college football broadcast in progress — players on the field, broadcast graphics, scoreboard visible.`,
+    `He is mid-reaction to a big play, leaning forward, holding a beer or remote. Warm afternoon sunlight through curtains, slight bokeh on the TV.`,
+    `His face MUST be recognizable as the same person in the reference photo.`,
+    `Photoreal, magazine-quality, no watermarks, no extra people.`,
+  ].join(' '),
+
+  'selfie': [
+    `Photorealistic 16:9 close-up POV shot looking down at hands holding a modern smartphone in the lap of a young man on a couch.`,
+    `The phone screen displays the front-camera selfie view: the face of the person in the attached reference photo, grinning, head and shoulders, wearing Tennessee orange. Camera UI elements visible at top and bottom of the phone screen.`,
+    `Same cozy living room context in the periphery — couch fabric, blurred TV showing a football game in the background.`,
+    `His face MUST be recognizable as the same person in the reference photo.`,
+    `Photoreal, sharp focus on the phone screen, no watermarks.`,
+  ].join(' '),
+
+  'render': [
+    `Photorealistic 16:9 close-up POV shot of hands holding a modern smartphone, screen filling most of the frame.`,
+    `The phone screen displays the Gemini AI app generating a meme image. UI elements visible: the just-captured selfie thumbnail of the person in the attached reference photo at the top, a circular progress spinner in the center with Google's blue-purple-orange gradient, and text reading "Memifying with Disaster Girl..." below.`,
+    `Same cozy living room context in the periphery, blurred. Saturday football afternoon ambiance.`,
+    `Photoreal, sharp focus on the phone screen, no watermarks.`,
+  ].join(' '),
+
+  'chat': [
+    `Photorealistic 16:9 close-up POV shot of hands holding a modern smartphone, screen filling most of the frame.`,
+    `The phone screen displays an iMessage-style group chat thread titled "Vols Group Chat". The person in the attached reference photo just shared a meme image of himself (visible in the chat as a sent image bubble in blue). Below it, three reaction messages from other people in grey received bubbles: "LMAOOOOO 💀", "saving this forever", "🔥🔥🔥".`,
+    `Same cozy living room context in the periphery, blurred. Saturday football afternoon ambiance.`,
+    `Photoreal, sharp focus on the phone screen, no watermarks.`,
+  ].join(' '),
+};
+
+async function callGeminiSingleRef(key, refB64, prompt) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${encodeURIComponent(key)}`;
+  const body = {
+    contents: [{
+      parts: [
+        { text: prompt },
+        { inline_data: { mime_type: 'image/jpeg', data: refB64 } },
+      ],
+    }],
+    generationConfig: { responseModalities: ['IMAGE'] },
+  };
+  const r = await fetch(url, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body) });
+  if (!r.ok) {
+    const txt = await r.text();
+    throw new Error(`gemini ${r.status}: ${txt.slice(0, 400)}`);
+  }
+  const data = await r.json();
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  const imgPart = parts.find(p => p.inline_data || p.inlineData);
+  const inline  = imgPart?.inline_data || imgPart?.inlineData;
+  if (!inline?.data) throw new Error('no image in response');
+  return { mime: inline.mime_type || inline.mimeType || 'image/png', data: inline.data };
+}
+
 module.exports = async function handler(req, res) {
   try {
-    const { moment: mId, meme: mmId, direction } = req.query || {};
+    const { moment: mId, meme: mmId, direction, frame } = req.query || {};
+
+    const key = process.env.GEMINI_KEY;
+    if (!key) return res.status(500).json({ error: 'GEMINI_KEY env var not set' });
+
+    // storyboard frame mode — single shared image per kind, no meme combo
+    if (frame) {
+      const prompt = FRAME_PROMPTS[frame];
+      if (!prompt) return res.status(400).json({ error: 'unknown frame kind', got: frame });
+      const friendB64 = await loadFriend(req);
+      const img = await callGeminiSingleRef(key, friendB64, prompt);
+      res.setHeader('cache-control', 'public, max-age=86400, s-maxage=86400');
+      return res.status(200).json({ image: `data:${img.mime};base64,${img.data}`, frame });
+    }
+
     const moment = MOMENTS[mId];
     const meme   = MEMES[mmId];
     if (!moment || !meme) {
       return res.status(400).json({ error: 'invalid moment or meme', got: { moment: mId, meme: mmId } });
     }
 
-    const key = process.env.GEMINI_KEY;
-    if (!key) return res.status(500).json({ error: 'GEMINI_KEY env var not set' });
-
     const [friendB64, memeB64] = await Promise.all([loadFriend(req), loadMemeRef(req, mmId)]);
     const prompt = buildPrompt(moment, meme, direction);
     const img    = await callGemini(key, friendB64, memeB64, prompt);
 
-    // custom direction renders shouldn't be cached (each is unique)
     const cache = (direction && direction.trim())
       ? 'no-store'
       : 'public, max-age=86400, s-maxage=86400';
