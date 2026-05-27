@@ -74,8 +74,8 @@
   .h-title{font-family:var(--display);font-size:clamp(72px,14vw,210px);
     line-height:.86;letter-spacing:.005em;text-transform:uppercase;position:relative;
     text-shadow:0 0 60px rgba(255,45,45,.3)}
-  .h-title span{display:block}
-  .h-title .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .h-title > span{display:block}
+  .h-title .out{-webkit-text-stroke:2px var(--ink);color:transparent;display:inline}
   .h-sub{margin-top:28px;font-family:var(--cond);font-size:clamp(18px,2.2vw,24px);
     font-weight:500;color:var(--chalk);max-width:640px;position:relative;line-height:1.35}
 
@@ -551,8 +551,8 @@
   <div class="codename"><b class="beckett-mark" data-tip="Named for Sam Beckett — NBC's Quantum Leap protagonist who leaps directly into other people's most interesting moments. Beckett puts you in the ad the same way.">Beckett</b>codename · leap in</div>
   <div class="h-kick">Beckett · Q4 2026 · CFB Saturdays · BETA</div>
   <h1 class="h-title">
-    <span>Live sports meets</span>
-    <span class="out">Live ads</span>
+    <span>Live sports</span>
+    <span>Meets <span class="out">live ads</span></span>
   </h1>
   <p class="h-sub">A concept for how Gemini-built creative variants can be matched to dramatic live college sports moments. Ads are pre-produced ahead of broadcast and served contextually — matched to the moment, not made in it.</p>
 
