@@ -116,10 +116,26 @@
     .hero::after,.live-pulse{animation:none !important}
     .video-bg{display:none}
   }
+
+  /* ───────── mobile pass ───────── */
+  @media (max-width:768px){
+    /* drop the YouTube iframe on mobile — keeps the poster image as static bg, saves bandwidth + fixes iOS autoplay */
+    .video-bg iframe{display:none}
+  }
+  @media (max-width:700px){
+    /* shrink the CTV bezel border so the TV isn't a postage stamp */
+    .ctv-frame{border-width:6px}
+    /* storyboard wraps to 2 rows of 3 thumbs */
+    .sb-track{grid-template-columns:repeat(3,1fr)}
+    /* modal full-bleed on mobile */
+    .modal{padding:0;align-items:stretch}
+    .modal-body{max-width:100%;min-height:100%;padding:30px 22px}
+    .modal-close{top:10px;right:10px}
+  }
   .h-kick{font-family:var(--cond);font-size:clamp(14px,1.6vw,18px);font-weight:600;
     letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
     margin-bottom:18px;position:relative}
-  .h-title{font-family:var(--display);font-size:clamp(72px,14vw,210px);
+  .h-title{font-family:var(--display);font-size:clamp(52px,13vw,210px);
     line-height:.86;letter-spacing:.005em;text-transform:uppercase;position:relative;
     text-shadow:0 0 60px rgba(255,45,45,.3)}
   .h-title > span{display:block}
@@ -172,7 +188,7 @@
     z-index:20;
     opacity:0;pointer-events:none;transition:opacity .18s;
     box-shadow:0 14px 40px rgba(0,0,0,.7)}
-  .beckett-mark:hover::before{opacity:1}
+  .beckett-mark:hover::before,.beckett-mark.tip-on::before{opacity:1}
   /* footer variant: anchor tip to the left so it stays on-screen */
   .beckett-mark.tip-left::before{right:auto;left:0}
   @media(max-width:700px){.codename{display:none}}
@@ -505,10 +521,12 @@
   .sb-thumb.active .sb-progress{transition:width .08s linear}
 
   @media(max-width:700px){
-    .sb-track{grid-template-columns:repeat(6,1fr);gap:5px}
-    .sbt-label{font-size:8px;padding:2px 4px}
+    .sb-track{grid-template-columns:repeat(3,1fr);gap:6px}
+    .sbt-label{font-size:9px;padding:2px 5px}
     .sb-controls{min-width:60px}
     .sb-play{width:36px;height:36px;font-size:14px}
+    .storyboard{flex-wrap:wrap}
+    .sb-controls{flex-direction:row;min-width:0;width:100%;justify-content:center;gap:14px}
   }
 
   /* ───────── direction input (regenerate with custom prompt) ───────── */
@@ -1361,6 +1379,18 @@
     document.body.style.overflow = '';
   }
   bindModalOpens();
+
+  // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
+  document.querySelectorAll('.beckett-mark').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      document.querySelectorAll('.beckett-mark.tip-on').forEach(o => { if (o !== el) o.classList.remove('tip-on'); });
+      el.classList.toggle('tip-on');
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.beckett-mark.tip-on').forEach(o => o.classList.remove('tip-on'));
+  });
 </script>
 </body>
 </html>
