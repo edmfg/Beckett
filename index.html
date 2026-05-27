@@ -397,14 +397,6 @@
   </h1>
   <p class="h-sub">This concept shows how Gemini can meme-ify fan reactions to dramatic live college sports events. Custom ads would appear soon after the live moment.</p>
 
-  <div class="formula" id="hero-formula">
-    <div class="f-slot" data-slot="moment">MOMENT</div>
-    <div class="f-op">+</div>
-    <div class="f-slot" data-slot="meme">MEME</div>
-    <div class="f-eq">=</div>
-    <div class="f-ad">AD</div>
-  </div>
-
   <div class="h-cta">
     <a class="cta-primary" href="#step-1">Try it →</a>
     <button class="cta-ghost" data-open="terms">Deal terms</button>
@@ -716,13 +708,8 @@
   }
 
   function updateFormula(which, label) {
-    document.querySelector(`#hero-formula .f-slot[data-slot="${which}"]`)
-      .classList.add('filled');
-    document.querySelector(`#hero-formula .f-slot[data-slot="${which}"]`)
-      .textContent = label.toUpperCase();
     const stick = document.querySelector(`.pill[data-stick="${which}"]`);
-    stick.classList.add('filled');
-    stick.textContent = label;
+    if (stick) { stick.classList.add('filled'); stick.textContent = label; }
   }
 
   function maybeRevealOrPrompt() {
@@ -888,12 +875,8 @@
     pickedMeme   = null;
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     ['moment','meme'].forEach(k => {
-      const h = document.querySelector(`#hero-formula .f-slot[data-slot="${k}"]`);
-      h.classList.remove('filled');
-      h.textContent = k.toUpperCase();
       const s = document.querySelector(`.pill[data-stick="${k}"]`);
-      s.classList.remove('filled');
-      s.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+      if (s) { s.classList.remove('filled'); s.textContent = k.charAt(0).toUpperCase() + k.slice(1); }
     });
     document.getElementById('reveal').innerHTML = `
       <div class="reveal-empty">
