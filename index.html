@@ -413,7 +413,7 @@
   .sb-play:active{transform:scale(.95)}
   .sb-time{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.05em}
 
-  .sb-track{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+  .sb-track{flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;
     min-width:0}
   .sb-thumb{position:relative;cursor:pointer;background:#0a0a0d;
     border:2px solid var(--line);aspect-ratio:16/9;overflow:hidden;
@@ -438,7 +438,7 @@
   .sb-thumb.active .sb-progress{transition:width .08s linear}
 
   @media(max-width:700px){
-    .sb-track{grid-template-columns:repeat(5,1fr);gap:5px}
+    .sb-track{grid-template-columns:repeat(6,1fr);gap:5px}
     .sbt-label{font-size:8px;padding:2px 4px}
     .sb-controls{min-width:60px}
     .sb-play{width:36px;height:36px;font-size:14px}
@@ -540,11 +540,6 @@
 </style>
 </head>
 <body>
-
-<div class="notice-banner" role="note">
-  <span class="nb-tag">Note</span>
-  <span class="nb-msg"><b>All ads are pre-produced.</b> They appear contextually based on the live sport moment — they are not generated in real time. The interactive demo below uses Gemini to render one variant per combination as a visualization of what the pre-produced creative would look like.</span>
-</div>
 
 <header class="topbar">
   <div class="brand">
@@ -920,13 +915,14 @@
   // ────────────────────────────────────────────────────────
   // STORYBOARD — 5 frames of a :15 CTV spot
   // ────────────────────────────────────────────────────────
-  // story arc: dude on couch -> selfie -> Gemini renders -> meme drops in group chat
+  // story arc: dude on couch -> selfie -> Gemini renders -> meme -> group chat -> brand sign-off
   const FRAMES = [
     { id:'couch',   dur:3000, t:'0:00', label:'The play'    },
     { id:'selfie',  dur:2000, t:'0:03', label:'Selfie'      },
-    { id:'render',  dur:3000, t:'0:05', label:'Gemini'      },
-    { id:'meme',    dur:4000, t:'0:08', label:'The meme'    },
-    { id:'chat',    dur:3000, t:'0:12', label:'Group chat'  },
+    { id:'render',  dur:3000, t:'0:05', label:'Render'      },
+    { id:'meme',    dur:3000, t:'0:08', label:'The meme'    },
+    { id:'chat',    dur:2000, t:'0:11', label:'Group chat'  },
+    { id:'logo',    dur:2000, t:'0:13', label:'Gemini'      },
   ];
   const TOTAL_MS = FRAMES.reduce((s,f) => s + f.dur, 0);
 
@@ -986,7 +982,18 @@
         </div>
       </div>`;
 
-    return f0 + f1 + f2 + f3 + f4;
+    const f5 = `
+      <div class="frame-stage" data-fi="5">
+        <div class="fs-card" style="background:
+          radial-gradient(ellipse at center,rgba(74,140,255,.18) 0%,rgba(138,92,255,.10) 35%,rgba(255,138,61,.06) 60%,#000 90%),
+          #000;">
+          <img src="/assets/gemini-logo.png" alt="Gemini"
+            style="max-width:55%;max-height:42%;object-fit:contain;
+              filter:drop-shadow(0 6px 30px rgba(138,92,255,.4))">
+        </div>
+      </div>`;
+
+    return f0 + f1 + f2 + f3 + f4 + f5;
   }
 
   function buildThumbs(moment, meme) {
@@ -996,6 +1003,12 @@
         inner = `<img src="/images/ads/${moment.id}-${meme.id}.jpg" alt=""
           onerror="this.parentElement.querySelector('.sbt-card').style.display='flex'">
           <div class="sbt-card" style="display:none;position:absolute;inset:0">${meme.name}</div>`;
+      } else if (f.id === 'logo') {
+        inner = `<div class="sbt-card" style="background:
+          radial-gradient(ellipse at center,rgba(74,140,255,.2),rgba(138,92,255,.12) 50%,#000);
+          padding:6px">
+          <img src="/assets/gemini-logo.png" alt="Gemini"
+            style="max-width:80%;max-height:70%;object-fit:contain"></div>`;
       } else {
         // couch / selfie / render / chat all use the shared photoreal frame images
         inner = `<img src="/images/frames/${f.id}.jpg" alt="">`;
