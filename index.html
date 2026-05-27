@@ -192,7 +192,30 @@
   .reveal-empty .e-msg{font-family:var(--display);font-size:clamp(28px,4vw,52px);
     text-transform:uppercase;letter-spacing:.02em;color:var(--chalk)}
 
-  .ctv-frame{max-width:960px;margin:0 auto;position:relative;
+  .reveal-stage{display:flex;align-items:center;justify-content:center;gap:28px;
+    max-width:1180px;margin:0 auto}
+  @media(max-width:900px){.reveal-stage{flex-direction:column;gap:18px}}
+
+  .ref-panel{flex-shrink:0;width:200px;display:flex;flex-direction:column;
+    align-items:center;gap:10px}
+  @media(max-width:900px){.ref-panel{width:160px}}
+  .ref-label{font-family:var(--cond);font-weight:700;font-size:11px;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--mute);text-align:center}
+  .ref-photo{width:100%;aspect-ratio:1/1;overflow:hidden;
+    border:2px solid var(--line);background:#15151a;
+    display:flex;align-items:center;justify-content:center}
+  .ref-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .ref-photo img.failed{display:none}
+  .ref-photo .rp-ph{font-family:var(--cond);font-weight:700;font-size:13px;
+    letter-spacing:.18em;color:var(--mute)}
+  .ref-caption{font-family:var(--body);font-size:12px;color:var(--mute);
+    text-align:center;line-height:1.4;max-width:180px}
+  .ref-arrow{font-family:var(--display);font-size:48px;color:var(--accent);
+    line-height:1;flex-shrink:0;align-self:center}
+  @media(max-width:900px){.ref-arrow{transform:rotate(90deg)}}
+
+  .ctv-wrap{flex:1;min-width:0;max-width:960px}
+  .ctv-frame{position:relative;
     background:#000;border:14px solid #1a1a1f;border-radius:6px;
     box-shadow:0 0 0 1px #000,0 30px 80px rgba(0,0,0,.6),
       0 0 120px rgba(255,45,45,.12);
@@ -695,29 +718,36 @@
     const caption = DEFAULT_CAPTION;
 
     reveal.innerHTML = `
-      <div class="ctv-frame" id="ctv-frame">
-        <img class="ad-img" id="ad-img"
-             alt="${moment.name} × ${meme.name}"
-             style="display:none">
-        <div class="ad-placeholder" id="ad-ph">
-          <div class="ph-kick">Beckett · awaiting Gemini render</div>
-          <div class="ph-formula">${moment.name}<br>× ${meme.name}</div>
-          <div class="ph-friend">
-            <div class="friend-av lg">
-              <img src="/images/friend.jpg" alt="Friend" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
-              <div class="fa-ph" style="display:none">YOU</div>
+      <div class="reveal-stage">
+        <div class="ref-panel">
+          <div class="ref-label">Original</div>
+          <div class="ref-photo">
+            <img src="/images/friend.jpg" alt="Reference photo" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
+            <div class="rp-ph" style="display:none">REFERENCE</div>
+          </div>
+          <div class="ref-caption">Source photo passed to Gemini as the friend reference</div>
+        </div>
+        <div class="ref-arrow">→</div>
+        <div class="ctv-wrap">
+          <div class="ctv-frame" id="ctv-frame">
+            <img class="ad-img" id="ad-img"
+                 alt="${moment.name} × ${meme.name}"
+                 style="display:none">
+            <div class="ad-placeholder" id="ad-ph">
+              <div class="ph-kick">Beckett · awaiting Gemini render</div>
+              <div class="ph-formula">${moment.name}<br>× ${meme.name}</div>
+              <div class="ph-desc">${copy}</div>
+              <div class="ph-note">model: gemini-3-pro-image-preview · key: GEMINI_KEY</div>
+            </div>
+            <div class="render-overlay on" id="render-ov">
+              <div class="spinner"></div>
+              <div class="render-msg"><span class="gem">Gemini</span> · rendering your ad…</div>
             </div>
           </div>
-          <div class="ph-desc">${copy}</div>
-          <div class="ph-note">model: gemini-3-pro-image-preview · key: GEMINI_KEY</div>
-        </div>
-        <div class="render-overlay on" id="render-ov">
-          <div class="spinner"></div>
-          <div class="render-msg"><span class="gem">Gemini</span> · rendering your ad…</div>
+          <div class="ctv-stand"></div>
+          <div class="ctv-stand-base"></div>
         </div>
       </div>
-      <div class="ctv-stand"></div>
-      <div class="ctv-stand-base"></div>
       <div class="reveal-meta">
         <div class="caption" id="ad-caption"><span class="em">${moment.name} × ${meme.name}.</span> ${caption}</div>
         <div class="gem-lockup"><span class="dot"></span> Powered by Gemini · Nano Banana Pro</div>
