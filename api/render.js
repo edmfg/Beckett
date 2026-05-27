@@ -12,15 +12,20 @@ const MOMENTS = {
   'kick-td':      { name: 'Kickoff Return TD', beat: 'Tennessee returns the opening kickoff for a touchdown' },
   'block-punt':   { name: 'Blocked Punt TD',   beat: 'Tennessee blocks an Alabama punt and recovers in the endzone' },
   'turnover-dn':  { name: 'Turnover on Downs', beat: 'Tennessee stops Alabama on 4th down in Alabama territory' },
+  'close-game':   { name: 'Close Game',        beat: 'A tense back-and-forth Tennessee vs Alabama game in the 4th quarter with the score within 7 points; sideline anxiety, crowd on its feet, every snap matters' },
 };
 
 const MEMES = {
-  'this-is-fine':   { name: 'This Is Fine',         brief: 'the "This Is Fine" cartoon-dog webcomic — a small round smiling cartoon dog with a hat sitting at a tiny table holding a coffee cup, vacant smile, while flames engulf the entire room. Soft flat-color line-art illustration style.' },
-  'disaster-girl':  { name: 'Disaster Girl',        brief: 'the 2004 "Disaster Girl" photo meme — a young girl in the immediate foreground looking back over her shoulder at the camera with a smug knowing smirk, a building burning dramatically in the daytime background behind her.' },
-  'side-eye-chloe': { name: 'Side-Eye Chloe',       brief: 'the "Side-Eye Chloe" meme — a young blonde toddler seated in a car seat giving an extreme skeptical sideways glance directly at the camera, one eyebrow slightly raised, lips pursed in suspicion.' },
-  'success-kid':    { name: 'Success Kid',          brief: 'the "Success Kid" meme — a toddler on a sunny beach with a clenched fist of triumph raised in front of his chest, holding a handful of wet sand, confident victorious expression. Beach background with blurred ocean.' },
-  'harold':         { name: 'Hide the Pain Harold', brief: 'the "Hide the Pain Harold" stock-photo meme — an older bald man with grey hair on the sides wearing a button-up shirt, giving a tight forced smile while his eyes betray visible inner suffering. Plain stock-photo lighting.' },
-  'doge':           { name: 'Doge',                 brief: 'the classic "Doge" meme — a Shiba Inu dog photographed from above looking up sideways at the camera with eyebrows raised in a judgmental expression. Multicolored Comic Sans phrases like "such wow", "very much", "so touchdown" floating at jaunty angles around the dog.' },
+  'this-is-fine':    { name: 'This Is Fine',         brief: 'the "This Is Fine" cartoon-dog webcomic — a small round smiling cartoon dog with a hat sitting at a tiny table holding a coffee cup, vacant smile, while flames engulf the entire room. Soft flat-color line-art illustration style.' },
+  'disaster-girl':   { name: 'Disaster Girl',        brief: 'the 2004 "Disaster Girl" photo meme — a young girl in the immediate foreground looking back over her shoulder at the camera with a smug knowing smirk, a building burning dramatically in the daytime background behind her.' },
+  'side-eye-chloe':  { name: 'Side-Eye Chloe',       brief: 'the "Side-Eye Chloe" meme — a young blonde toddler seated in a car seat giving an extreme skeptical sideways glance directly at the camera, one eyebrow slightly raised, lips pursed in suspicion.' },
+  'success-kid':     { name: 'Success Kid',          brief: 'the "Success Kid" meme — a toddler on a sunny beach with a clenched fist of triumph raised in front of his chest, holding a handful of wet sand, confident victorious expression. Beach background with blurred ocean.' },
+  'harold':          { name: 'Hide the Pain Harold', brief: 'the "Hide the Pain Harold" stock-photo meme — an older bald man with grey hair on the sides wearing a button-up shirt, giving a tight forced smile while his eyes betray visible inner suffering. Plain stock-photo lighting.' },
+  'doge':            { name: 'Doge',                 brief: 'the classic "Doge" meme — a Shiba Inu dog photographed from above looking up sideways at the camera with eyebrows raised in a judgmental expression. Multicolored Comic Sans phrases like "such wow", "very much", "so touchdown" floating at jaunty angles around the dog.' },
+  'stonks':          { name: 'Stonks',               brief: 'the "Stonks" meme — a CGI bald man in a dark suit and red tie standing in front of a rising green stock-market arrow chart, with the bold word "STONKS" in white letters at the top. Clean financial-news graphic background.' },
+  'roll-safe':       { name: 'Roll Safe',            brief: 'the "Roll Safe" meme — a young man tapping his temple with his index finger, smiling knowingly at the camera as if making a clever realization. Photo from a UK YouTube comedy series, head and shoulders framing.' },
+  'two-buttons':     { name: 'Two Buttons',          brief: 'the "Two Buttons" sweating-decision meme — a single figure in a red shirt and black tie sweating profusely while hovering over two red buttons on a console, paralyzed by indecision. Comic-book panel illustration style.' },
+  'expanding-brain': { name: 'Expanding Brain',      brief: 'the "Expanding Brain" four-panel meme — four stacked panels each showing a brain in progressively more enlightened/transcendent state: regular brain, glowing brain, brain bursting with rays of light, brain as cosmic galaxy. Each panel labelled with escalating concepts.' },
 };
 
 let FRIEND_B64 = null;

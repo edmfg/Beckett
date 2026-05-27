@@ -6,8 +6,8 @@
 const fs   = require('fs');
 const path = require('path');
 
-const MOMENTS = ['fumble','pick-six','interception','strip-sack','punt-td','kick-td','block-punt','turnover-dn'];
-const MEMES   = ['this-is-fine','disaster-girl','side-eye-chloe','success-kid','harold','doge'];
+const MOMENTS = ['fumble','pick-six','interception','strip-sack','punt-td','kick-td','block-punt','turnover-dn','close-game'];
+const MEMES   = ['this-is-fine','disaster-girl','side-eye-chloe','success-kid','harold','doge','stonks','roll-safe','two-buttons','expanding-brain'];
 
 (async () => {
   const args = process.argv.slice(2);
