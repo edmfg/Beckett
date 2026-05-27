@@ -17,7 +17,6 @@ const MOMENTS = {
   'strip-sack':   { name: 'Strip Sack',        beat: 'Tennessee strips the Alabama quarterback in the pocket; the ball pops loose and a Vols lineman scoops it up' },
   'punt-td':      { name: 'Punt Return TD',    beat: 'A Tennessee returner takes an Alabama punt 80 yards back for a touchdown, breaking tackles down the sideline' },
   'kick-td':      { name: 'Kickoff Return TD', beat: 'Tennessee returns the opening kickoff for a touchdown, the returner high-stepping into the endzone' },
-  'block-punt':   { name: 'Blocked Punt TD',   beat: 'Tennessee blocks an Alabama punt; the ball squirts backward into the endzone and a Vols special-teamer falls on it' },
   'turnover-dn':  { name: 'Turnover on Downs', beat: 'Tennessee stuffs Alabama on 4th-and-1 in Alabama territory; the Vols defense erupts off the pile' },
   'close-game':   { name: 'Close Game',        beat: 'A tense back-and-forth Tennessee vs Alabama game in the 4th quarter with the score within 7 points; sideline anxiety, crowd on its feet, every snap matters, scoreboard visible showing a tight score' },
 };
@@ -33,6 +32,8 @@ const MEMES = {
   'roll-safe':       { name: 'Roll Safe',            brief: 'the "Roll Safe" meme — a young man tapping his temple with his index finger, smiling knowingly at the camera as if making a clever realization. Photo from a UK YouTube comedy series, head and shoulders framing.' },
   'two-buttons':     { name: 'Two Buttons',          brief: 'the "Two Buttons" sweating-decision meme — a single figure in a red shirt and black tie sweating profusely while hovering over two red buttons on a console, paralyzed by indecision. Comic-book panel illustration style.' },
   'expanding-brain': { name: 'Expanding Brain',      brief: 'the "Expanding Brain" four-panel meme — four stacked panels each showing a brain in progressively more enlightened/transcendent state: regular brain, glowing brain, brain bursting with rays of light, brain as cosmic galaxy. Each panel labelled with escalating concepts.' },
+  'crying-cat':      { name: 'Crying Cat',           brief: 'the "Crying Cat" meme — a close-up photo of a small white cat with large glistening tears welling up in both eyes, often combined with a faint forced smile. Conveys heartbreak with brave-face energy. Soft natural lighting, low-fi web-snapshot aesthetic.' },
+  'monkey-puppet':   { name: 'Monkey Puppet',        brief: 'the "Awkward Look Monkey Puppet" meme — a brown plush monkey puppet making an exaggerated sideways eye-dart away from the camera, pure cringing awkwardness. Two-frame composition is fine; expression must read as caught-in-the-act discomfort.' },
 };
 
 function buildPrompt(moment, meme) {
