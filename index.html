@@ -140,6 +140,39 @@
   .friend-av.lg{width:160px;height:160px;border:2px solid var(--accent)}
   .friend-av.lg .fa-ph{font-size:16px}
 
+  /* ───────── why-panel: the role of this campaign ───────── */
+  .why-panel{padding:7vh 6vw 8vh;
+    background:linear-gradient(180deg,#0a0a0d 0%,var(--bg) 100%);
+    border-top:1px solid var(--line)}
+  .why-kick{font-family:var(--cond);font-weight:700;font-size:13px;
+    letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .why-title{font-family:var(--display);font-size:clamp(32px,4.5vw,56px);
+    text-transform:uppercase;letter-spacing:.02em;line-height:.95;margin-bottom:36px}
+  .why-grid{display:grid;grid-template-columns:1fr 1fr;
+    border:1px solid var(--line);background:#0d0d0f;max-width:1080px}
+  @media(max-width:700px){.why-grid{grid-template-columns:1fr}}
+  .why-col{padding:26px 28px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+  .why-col:last-child{border-right:none;background:rgba(255,45,45,.04)}
+  @media(max-width:700px){.why-col{border-right:none;border-bottom:1px solid var(--line)}
+    .why-col:last-child{border-bottom:none}}
+  .why-brand{font-family:var(--display);font-size:clamp(22px,2.6vw,28px);
+    letter-spacing:.03em;text-transform:uppercase;margin-bottom:10px;color:var(--ink);
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .why-brand .small{font-family:var(--cond);font-weight:600;font-size:11px;
+    letter-spacing:.28em;color:var(--mute);text-transform:uppercase}
+  .why-col:last-child .why-brand .small{color:var(--accent)}
+  .why-line{font-family:var(--body);font-size:14px;color:var(--chalk);line-height:1.5;
+    padding:10px 0;border-top:1px solid var(--line)}
+  .why-line:first-of-type{border-top:none;padding-top:4px}
+  .why-line b{color:var(--ink);font-weight:600}
+  .why-line em{font-style:normal;font-family:var(--cond);font-weight:600;font-size:10px;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--mute);
+    display:block;margin-bottom:4px}
+
+  .why-foot{font-family:var(--body);font-size:15px;color:var(--chalk);line-height:1.6;
+    margin-top:26px;max-width:780px}
+  .why-foot b{color:var(--ink);font-weight:600}
+
   /* ───────── sticky formula bar (after hero) ───────── */
   .stick-wrap{position:relative}
   .stick-bar{position:sticky;top:0;z-index:4;
@@ -531,7 +564,28 @@
   <div class="scroll-cue nudge">Scroll · 01 / 03</div>
 </div>
 
-<!-- ───────── STICKY FORMULA BAR + STEPS ───────── -->
+<!-- ───────── WHY PANEL — the role of this campaign ───────── -->
+<section class="why-panel" id="why">
+  <div class="why-kick">The role of this campaign</div>
+  <h2 class="why-title">Two products. Two jobs.</h2>
+  <div class="why-grid">
+    <div class="why-col">
+      <div class="why-brand">Google Search <span class="small">Information</span></div>
+      <div class="why-line"><em>The job</em>Answers questions.</div>
+      <div class="why-line"><em>Fan asks</em>"What's the score?" "Who fumbled?"</div>
+      <div class="why-line"><em>Posture</em>Authoritative. Logical. Definitive.</div>
+    </div>
+    <div class="why-col">
+      <div class="why-brand">Gemini <span class="small">Expression</span></div>
+      <div class="why-line"><em>The job</em>Helps fans be creative.</div>
+      <div class="why-line"><em>Fan asks</em>"Make a meme of this." "What would I look like in the moment?"</div>
+      <div class="why-line"><em>Posture</em>Playful. Personal. Generative.</div>
+    </div>
+  </div>
+  <p class="why-foot"><b>Beckett demonstrates the second one.</b> It proves Gemini's place in the cultural moments fans actually live in — the ones they share, react to, and turn into jokes — not the ones they need to look up.</p>
+</section>
+
+<!-- ───────── STEPS ───────── -->
 <div class="stick-wrap">
   <!-- STEP 1 — MOMENT -->
   <section id="step-1">
