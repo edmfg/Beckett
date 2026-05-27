@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Beckett · Enter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f; --ink:#ffffff; --mute:#9a9aa2;
+    --accent:#ff2d2d; --chalk:#f2f0e6; --line:#2a2a30;
+    --display:'Anton',sans-serif; --cond:'Barlow Condensed',sans-serif;
+    --body:'Barlow',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:24px;overflow:hidden;position:relative;
+    -webkit-font-smoothing:antialiased}
+  body::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.25),transparent 70%);
+    animation:breathe 6.5s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:.6}50%{opacity:1}}
+  .gate{position:relative;z-index:1;width:100%;max-width:440px;text-align:center}
+  .kick{font-family:var(--cond);font-weight:600;font-size:13px;
+    letter-spacing:.32em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:16px}
+  h1{font-family:var(--display);font-size:clamp(56px,9vw,96px);
+    line-height:.88;letter-spacing:.01em;text-transform:uppercase;
+    margin-bottom:14px;text-shadow:0 0 50px rgba(255,45,45,.25)}
+  .sub{font-family:var(--cond);font-size:16px;color:var(--chalk);
+    letter-spacing:.04em;margin-bottom:34px;line-height:1.4}
+  form{display:flex;gap:10px;align-items:stretch}
+  input[type=password]{flex:1;min-width:0;
+    background:#0a0a0d;border:1.5px solid var(--line);color:var(--ink);
+    font-family:var(--body);font-size:16px;padding:14px 16px;
+    transition:border-color .2s;letter-spacing:.04em}
+  input[type=password]:focus{outline:none;border-color:var(--accent)}
+  input[type=password]::placeholder{color:var(--mute);font-style:italic}
+  button{font-family:var(--cond);font-weight:700;font-size:14px;
+    letter-spacing:.24em;text-transform:uppercase;
+    padding:0 24px;background:var(--accent);color:#fff;border:none;cursor:pointer;
+    transition:background .15s,opacity .15s}
+  button:hover:not(:disabled){background:#ff4242}
+  button:disabled{opacity:.5;cursor:wait}
+  .err{margin-top:14px;font-family:var(--body);font-size:13px;
+    color:var(--accent);min-height:1.4em;letter-spacing:.02em}
+  .foot{position:absolute;bottom:20px;left:0;right:0;z-index:1;
+    font-family:var(--cond);font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--mute);text-align:center}
+  .foot b{color:var(--chalk);font-weight:700}
+</style>
+</head>
+<body>
+  <div class="gate">
+    <div class="kick">Beckett · restricted preview</div>
+    <h1>Enter</h1>
+    <p class="sub">This is a working pitch artifact for the Gemini × NBC Sports Live Contextual concept. Password required.</p>
+    <form id="f" autocomplete="off">
+      <input type="password" id="pw" placeholder="Password" autofocus required>
+      <button type="submit" id="b">Enter →</button>
+    </form>
+    <div class="err" id="e"></div>
+  </div>
+  <div class="foot"><b>BECKETT</b> · Gemini × NBCU Live Contextual</div>
+<script>
+  const f = document.getElementById('f');
+  const pw = document.getElementById('pw');
+  const b = document.getElementById('b');
+  const e = document.getElementById('e');
+  f.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const password = pw.value.trim();
+    if (!password) return;
+    b.disabled = true; b.textContent = 'Checking…'; e.textContent = '';
+    try {
+      const r = await fetch('/api/auth', {
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body: JSON.stringify({ password })
+      });
+      if (r.ok) {
+        const dest = new URLSearchParams(location.search).get('next') || '/';
+        location.href = dest;
+        return;
+      }
+      const j = await r.json().catch(() => ({}));
+      e.textContent = r.status === 403 ? 'Incorrect password.' : (j.error || 'Something went wrong.');
+    } catch (err) {
+      e.textContent = 'Network error — try again.';
+    } finally {
+      b.disabled = false; b.textContent = 'Enter →';
+    }
+  });
+</script>
+</body>
+</html>
