@@ -280,6 +280,31 @@
   .reveal-actions{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;
     justify-content:center}
 
+  /* ───────── direction input (regenerate with custom prompt) ───────── */
+  .direct-panel{margin:34px auto 0;max-width:760px;
+    border:1px solid var(--line);padding:22px 24px;background:#15151a}
+  .direct-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .direct-head .dh-kick{font-family:var(--cond);font-weight:700;font-size:11px;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent)}
+  .direct-head .dh-title{font-family:var(--cond);font-weight:600;font-size:15px;
+    letter-spacing:.04em;color:var(--ink)}
+  .direct-form{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+  .direct-input{flex:1;min-width:240px;
+    background:#0a0a0d;border:1px solid var(--line);color:var(--ink);
+    font-family:var(--body);font-size:14px;padding:12px 14px;line-height:1.4;
+    resize:vertical;min-height:46px;transition:border-color .2s}
+  .direct-input:focus{outline:none;border-color:var(--accent)}
+  .direct-input::placeholder{color:var(--mute);font-style:italic}
+  .direct-btn{font-family:var(--cond);font-weight:700;font-size:13px;
+    letter-spacing:.22em;text-transform:uppercase;
+    padding:0 22px;background:var(--accent);color:#fff;white-space:nowrap;
+    transition:background .15s,opacity .15s}
+  .direct-btn:hover:not(:disabled){background:#ff4242}
+  .direct-btn:disabled{opacity:.5;cursor:wait}
+  .direct-help{font-family:var(--body);font-size:12px;color:var(--mute);
+    margin-top:10px;line-height:1.5}
+  .direct-help b{color:var(--chalk);font-weight:600}
+
   /* ───────── built-with section ───────── */
   .built{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
   @media(max-width:900px){.built{grid-template-columns:1fr}}
@@ -756,9 +781,27 @@
         <button class="cta-primary" id="again-btn">Try another combination →</button>
         <button class="cta-ghost" data-open="made">How it's made →</button>
       </div>
+      <div class="direct-panel">
+        <div class="direct-head">
+          <span class="dh-kick">Direct the AI</span>
+          <span class="dh-title">Add your own creative direction and regenerate</span>
+        </div>
+        <form class="direct-form" id="direct-form">
+          <textarea class="direct-input" id="direct-input" rows="1"
+            placeholder="e.g. add a Smokey the bluetick coonhound mascot, or make the burning building Bryant-Denny, or use the 2009 throwback Vols jersey"
+            maxlength="500"></textarea>
+          <button class="direct-btn" type="submit" id="direct-btn">Regenerate →</button>
+        </form>
+        <div class="direct-help">Calls Gemini live with your direction appended to the prompt. <b>~8 seconds.</b> Each custom render is fresh (not cached).</div>
+      </div>
     `;
 
     document.getElementById('again-btn').addEventListener('click', resetAll);
+    document.getElementById('direct-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const txt = document.getElementById('direct-input').value.trim();
+      regenerate(txt);
+    });
     bindModalOpens();
 
     // scroll the reveal into view
@@ -766,29 +809,78 @@
       document.getElementById('step-3').scrollIntoView({ behavior:'smooth', block:'start' });
     }, 250);
 
-    // fire live Gemini render
+    // static-first: try the pre-rendered image; on miss, fall back to live /api/render
     clearTimeout(renderTimer);
-    const myKey = key;
-    fetch(`/api/render?moment=${pickedMoment}&meme=${pickedMeme}`)
-      .then(r => r.ok ? r.json() : Promise.reject(new Error('render failed: ' + r.status)))
-      .then(data => {
-        // ignore if user moved on to a different combo
-        if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
-        if (!data.image) throw new Error('no image returned');
-        const img = document.getElementById('ad-img');
-        img.src = data.image; // data: URL from API
-        img.style.display = 'block';
-        document.getElementById('ad-ph').style.display = 'none';
-        document.getElementById('render-ov').classList.remove('on');
+    loadAd({ direction: '' });
+  }
+
+  function loadAd({ direction }) {
+    const myKey = `${pickedMoment}|${pickedMeme}`;
+    const overlay = document.getElementById('render-ov');
+    if (overlay) overlay.classList.add('on');
+
+    const onSuccess = (src) => {
+      if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
+      const img = document.getElementById('ad-img');
+      img.src = src;
+      img.style.display = 'block';
+      document.getElementById('ad-ph').style.display = 'none';
+      if (overlay) overlay.classList.remove('on');
+    };
+    const onFail = (err) => {
+      if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
+      console.error('[beckett] render error:', err);
+      if (overlay) overlay.classList.remove('on');
+      const cap = document.getElementById('ad-caption');
+      if (cap && !cap.dataset.warned) {
+        cap.innerHTML += ' <span style="color:var(--mute)">· live render unavailable</span>';
+        cap.dataset.warned = '1';
+      }
+    };
+
+    // skip static lookup for custom-direction renders
+    const skipStatic = !!direction;
+    const staticUrl  = `/images/ads/${pickedMoment}-${pickedMeme}.jpg`;
+
+    const tryLive = () => {
+      const qs = new URLSearchParams({ moment: pickedMoment, meme: pickedMeme });
+      if (direction) qs.set('direction', direction);
+      fetch(`/api/render?${qs.toString()}`)
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('render failed: ' + r.status)))
+        .then(data => {
+          if (!data.image) throw new Error('no image returned');
+          onSuccess(data.image);
+        })
+        .catch(onFail);
+    };
+
+    if (skipStatic) { tryLive(); return; }
+
+    // probe static image with HEAD; if missing, go live
+    fetch(staticUrl, { method: 'HEAD' })
+      .then(r => {
+        if (r.ok) onSuccess(staticUrl);
+        else tryLive();
       })
-      .catch(err => {
-        if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
-        // keep the styled placeholder; drop the overlay and annotate caption
-        console.error('[beckett] render error:', err);
-        document.getElementById('render-ov').classList.remove('on');
-        const cap = document.getElementById('ad-caption');
-        if (cap) cap.innerHTML += ' <span style="color:var(--mute)">· live render unavailable</span>';
-      });
+      .catch(tryLive);
+  }
+
+  function regenerate(direction) {
+    const btn   = document.getElementById('direct-btn');
+    const input = document.getElementById('direct-input');
+    btn.disabled = true; input.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = 'Rendering…';
+    loadAd({ direction });
+    // re-enable after the live call settles — listen to overlay
+    const ov = document.getElementById('render-ov');
+    const wait = setInterval(() => {
+      if (!ov || !ov.classList.contains('on')) {
+        clearInterval(wait);
+        btn.disabled = false; input.disabled = false;
+        btn.textContent = prev;
+      }
+    }, 250);
   }
 
   function resetAll() {

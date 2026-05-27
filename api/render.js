@@ -15,51 +15,64 @@ const MOMENTS = {
 };
 
 const MEMES = {
-  'this-is-fine':   { name: 'This Is Fine',         brief: 'the "This Is Fine" cartoon-dog meme — a smiling round cartoon dog sitting at a small table while flames engulf the room; soft webcomic style' },
-  'disaster-girl':  { name: 'Disaster Girl',        brief: 'the "Disaster Girl" meme — a young girl in the foreground giving a smug knowing smirk at the camera while a building burns behind her' },
-  'side-eye-chloe': { name: 'Side-Eye Chloe',       brief: 'the "Side-Eye Chloe" meme — a child giving a deeply skeptical sideways glance, eyebrow slightly raised' },
-  'success-kid':    { name: 'Success Kid',          brief: 'the "Success Kid" meme — a toddler at the beach with a clenched fist of triumph, holding sand' },
-  'harold':         { name: 'Hide the Pain Harold', brief: 'the "Hide the Pain Harold" meme — an older bald man with a strained forced smile and visibly sad knowing eyes' },
-  'doge':           { name: 'Doge',                 brief: 'the classic "Doge" meme — a Shiba Inu with surrounding multicolored Comic Sans phrases like "such wow", "very much", "so football"' },
+  'this-is-fine':   { name: 'This Is Fine',         brief: 'the "This Is Fine" cartoon-dog webcomic — a small round smiling cartoon dog with a hat sitting at a tiny table holding a coffee cup, vacant smile, while flames engulf the entire room. Soft flat-color line-art illustration style.' },
+  'disaster-girl':  { name: 'Disaster Girl',        brief: 'the 2004 "Disaster Girl" photo meme — a young girl in the immediate foreground looking back over her shoulder at the camera with a smug knowing smirk, a building burning dramatically in the daytime background behind her.' },
+  'side-eye-chloe': { name: 'Side-Eye Chloe',       brief: 'the "Side-Eye Chloe" meme — a young blonde toddler seated in a car seat giving an extreme skeptical sideways glance directly at the camera, one eyebrow slightly raised, lips pursed in suspicion.' },
+  'success-kid':    { name: 'Success Kid',          brief: 'the "Success Kid" meme — a toddler on a sunny beach with a clenched fist of triumph raised in front of his chest, holding a handful of wet sand, confident victorious expression. Beach background with blurred ocean.' },
+  'harold':         { name: 'Hide the Pain Harold', brief: 'the "Hide the Pain Harold" stock-photo meme — an older bald man with grey hair on the sides wearing a button-up shirt, giving a tight forced smile while his eyes betray visible inner suffering. Plain stock-photo lighting.' },
+  'doge':           { name: 'Doge',                 brief: 'the classic "Doge" meme — a Shiba Inu dog photographed from above looking up sideways at the camera with eyebrows raised in a judgmental expression. Multicolored Comic Sans phrases like "such wow", "very much", "so touchdown" floating at jaunty angles around the dog.' },
 };
 
 let FRIEND_B64 = null;
-async function loadFriend(req) {
-  if (FRIEND_B64) return FRIEND_B64;
+const MEME_CACHE = {}; // memeId -> base64
+
+async function loadFromUrl(req, pathPart) {
   const host  = req.headers['x-forwarded-host'] || req.headers.host;
   const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
-  const url   = `${proto}://${host}/images/friend.jpg`;
+  const url   = `${proto}://${host}${pathPart}`;
   const r = await fetch(url);
-  if (!r.ok) throw new Error(`friend photo fetch failed (${r.status}) at ${url} — save the reference photo to /images/friend.jpg`);
-  const buf = Buffer.from(await r.arrayBuffer());
-  FRIEND_B64 = buf.toString('base64');
+  if (!r.ok) throw new Error(`fetch failed (${r.status}) at ${url}`);
+  return Buffer.from(await r.arrayBuffer()).toString('base64');
+}
+async function loadFriend(req) {
+  if (!FRIEND_B64) FRIEND_B64 = await loadFromUrl(req, '/images/friend.jpg');
   return FRIEND_B64;
 }
-
-function buildPrompt(moment, meme) {
-  return [
-    `Generate a single 16:9 image for a Live Contextual CTV ad spot.`,
-    ``,
-    `SUBJECT: Composite the person in the attached reference photo as the main figure of ${meme.brief}.`,
-    `Preserve his face and identity — he must be clearly recognizable as the person in the reference photo.`,
-    ``,
-    `WARDROBE / COLORS: Dress him in Tennessee Volunteers orange (#FF8200) — appropriate to the meme format (jersey, hoodie, or shirt).`,
-    ``,
-    `CONTEXT: ${moment.beat}. The setting should evoke a college football Saturday — Bryant-Denny / SEC atmosphere, but with Tennessee winning the moment.`,
-    ``,
-    `STYLE: Sharp, slightly oversaturated. CFB broadcast graphic energy meets meme template. Social-share ready. No watermarks, no other faces, no logos beyond the Tennessee / Alabama context.`,
-    ``,
-    `TEXT: If the meme template includes signature text (e.g. "this is fine", "such wow"), render it in the meme's signature font style, integrated naturally into the composition.`,
-  ].join('\n');
+async function loadMemeRef(req, memeId) {
+  if (!MEME_CACHE[memeId]) MEME_CACHE[memeId] = await loadFromUrl(req, `/images/memes/${memeId}.jpg`);
+  return MEME_CACHE[memeId];
 }
 
-async function callGemini(key, friendB64, prompt) {
+function buildPrompt(moment, meme, direction) {
+  const lines = [
+    `Generate a single 16:9 image — a meme version of a College Football moment.`,
+    ``,
+    `Two reference images are attached:`,
+    `  1) FRIEND PHOTO — a young white man with brown hair. His face and identity MUST be clearly recognizable in the output as the same person.`,
+    `  2) MEME TEMPLATE — ${meme.brief} The output MUST be visually recognizable as this exact meme template. Preserve the meme's signature composition, framing, art style, and core iconography. Replace any face in the meme with the FRIEND's face.`,
+    ``,
+    `WARDROBE: The friend is a Tennessee Volunteers fan — dress him in Tennessee orange (#FF8200), whatever garment fits the meme (jersey, hoodie, sweater, shirt).`,
+    ``,
+    `FOOTBALL CONTEXT: ${moment.beat}. Layer subtle Tennessee-vs-Alabama Saturday football references into the meme's background — orange checkerboard endzone visible in the distance, a Bryant-Denny stadium silhouette, a Tennessee T logo, an Alabama A logo on something Tennessee is beating, crowd in orange, etc. The football context should ENHANCE the meme, not replace it. The meme must remain the dominant visual.`,
+    ``,
+    `STYLE: Match the meme template's native art style exactly (cartoon for This Is Fine and Doge; photographic for Disaster Girl, Chloe, Success Kid, Harold). Sharp, slightly oversaturated, social-share ready. No watermarks, no extra faces.`,
+    ``,
+    `TEXT: Include the meme's signature caption text in its signature font, adapted to the football moment (e.g. "This is fine" stays as-is in a burning Alabama room; "such fumble. very Vols. wow." for Doge; etc.). Keep text minimal and meme-authentic.`,
+  ];
+  if (direction && direction.trim()) {
+    lines.push('', `ADDITIONAL DIRECTION FROM USER: ${direction.trim().slice(0, 500)}`);
+  }
+  return lines.join('\n');
+}
+
+async function callGemini(key, friendB64, memeB64, prompt) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=${encodeURIComponent(key)}`;
   const body = {
     contents: [{
       parts: [
         { text: prompt },
         { inline_data: { mime_type: 'image/jpeg', data: friendB64 } },
+        { inline_data: { mime_type: 'image/jpeg', data: memeB64 } },
       ],
     }],
     generationConfig: {
@@ -90,7 +103,7 @@ async function callGemini(key, friendB64, prompt) {
 
 module.exports = async function handler(req, res) {
   try {
-    const { moment: mId, meme: mmId } = req.query || {};
+    const { moment: mId, meme: mmId, direction } = req.query || {};
     const moment = MOMENTS[mId];
     const meme   = MEMES[mmId];
     if (!moment || !meme) {
@@ -100,14 +113,19 @@ module.exports = async function handler(req, res) {
     const key = process.env.GEMINI_KEY;
     if (!key) return res.status(500).json({ error: 'GEMINI_KEY env var not set' });
 
-    const friendB64 = await loadFriend(req);
-    const prompt    = buildPrompt(moment, meme);
-    const img       = await callGemini(key, friendB64, prompt);
+    const [friendB64, memeB64] = await Promise.all([loadFriend(req), loadMemeRef(req, mmId)]);
+    const prompt = buildPrompt(moment, meme, direction);
+    const img    = await callGemini(key, friendB64, memeB64, prompt);
 
-    res.setHeader('cache-control', 'public, max-age=86400, s-maxage=86400');
+    // custom direction renders shouldn't be cached (each is unique)
+    const cache = (direction && direction.trim())
+      ? 'no-store'
+      : 'public, max-age=86400, s-maxage=86400';
+    res.setHeader('cache-control', cache);
     return res.status(200).json({
       image: `data:${img.mime};base64,${img.data}`,
       combo: `${mId}|${mmId}`,
+      direction: direction || null,
     });
   } catch (e) {
     console.error('[beckett/render]', e);
