@@ -98,6 +98,24 @@
     text-transform:uppercase;color:var(--mute);text-align:right;line-height:1.5}
   .codename b{display:block;color:var(--chalk);font-weight:700;font-size:13px;
     letter-spacing:.38em;margin-bottom:2px}
+
+  /* hover tooltip for the Beckett mark — explains the Quantum Leap reference */
+  .beckett-mark{position:relative;cursor:help;
+    text-decoration:underline;text-decoration-style:dotted;
+    text-decoration-color:var(--mute);text-underline-offset:4px}
+  .beckett-mark:hover{text-decoration-color:var(--accent)}
+  .beckett-mark::before{content:attr(data-tip);
+    position:absolute;right:0;top:calc(100% + 12px);
+    width:max-content;max-width:300px;
+    padding:14px 16px;background:#0d0d0f;border:1px solid var(--line);
+    font-family:var(--body);font-weight:400;font-size:12px;letter-spacing:.01em;
+    text-transform:none;color:var(--chalk);line-height:1.55;text-align:left;
+    z-index:20;
+    opacity:0;pointer-events:none;transition:opacity .18s;
+    box-shadow:0 14px 40px rgba(0,0,0,.7)}
+  .beckett-mark:hover::before{opacity:1}
+  /* footer variant: anchor tip to the left so it stays on-screen */
+  .beckett-mark.tip-left::before{right:auto;left:0}
   @media(max-width:700px){.codename{display:none}}
 
   /* friend avatar — appears in placeholder + sticky bar */
@@ -481,7 +499,7 @@
 
 <!-- ───────── HERO ───────── -->
 <div class="hero">
-  <div class="codename"><b>Beckett</b>codename · leap in</div>
+  <div class="codename"><b class="beckett-mark" data-tip="Named for Sam Beckett — NBC's Quantum Leap protagonist who leaps directly into other people's most interesting moments. Beckett puts you in the ad the same way.">Beckett</b>codename · leap in</div>
   <div class="h-kick">Beckett · Q4 2026 · CFB Saturdays · BETA</div>
   <h1 class="h-title">
     <span>Live sports meets</span>
@@ -499,20 +517,6 @@
 
 <!-- ───────── STICKY FORMULA BAR + STEPS ───────── -->
 <div class="stick-wrap">
-  <div class="stick-bar" id="stick-bar">
-    <div class="friend-av" title="The friend who leaps into every ad">
-      <img src="/images/friend.jpg" alt="Friend" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
-      <div class="fa-ph" style="display:none">YOU</div>
-    </div>
-    <div class="sk">Beckett · live formula</div>
-    <div class="pill" data-stick="moment">Moment</div>
-    <div class="op">+</div>
-    <div class="pill" data-stick="meme">Meme</div>
-    <div class="op">=</div>
-    <div class="pill" data-stick="result" style="color:var(--accent);border-color:var(--accent);background:rgba(255,45,45,.06)">Ad</div>
-    <button class="reset" id="reset-btn">Reset</button>
-  </div>
-
   <!-- STEP 1 — MOMENT -->
   <section id="step-1">
     <div class="s-head">
@@ -580,7 +584,7 @@
 </div>
 
 <footer>
-  <div class="fl"><b>BECKETT</b> — leap into the ad · Gemini × NBCU Live Contextual</div>
+  <div class="fl"><b class="beckett-mark tip-left" data-tip="Named for Sam Beckett — NBC's Quantum Leap protagonist who leaps directly into other people's most interesting moments. Beckett puts you in the ad the same way.">BECKETT</b> — leap into the ad · Gemini × NBCU Live Contextual</div>
   <div class="fl">WPP · GroupM · Google · NBCU</div>
 </footer>
 
@@ -690,6 +694,7 @@
   // DATA
   // ────────────────────────────────────────────────────────
   const MOMENTS = [
+    { id:'close-game',  name:'Close Game',        desc:'Score within 7 points. Every snap could swing it. Sideline holds its breath.' },
     { id:'fumble',      name:'Fumble Recovery',   desc:'Loose ball, change of possession. Highest volume trigger of the CFB season.' },
     { id:'pick-six',    name:'Pick-Six',          desc:'Interception returned for a touchdown. Six-point swing in seven seconds.' },
     { id:'interception',name:'Interception',      desc:'Defender catches the pass. Drive ends, possession flips.' },
@@ -698,7 +703,6 @@
     { id:'kick-td',     name:'Kickoff Return TD', desc:'Opening-snap chaos. Resets every assumption about the game.' },
     { id:'block-punt',  name:'Blocked Punt TD',   desc:'Eleven seconds of pandemonium. Rare, loud, broadcast-defining.' },
     { id:'turnover-dn', name:'Turnover on Downs', desc:'4th-down stop in opponent territory. Momentum, scoring chance.' },
-    { id:'close-game',  name:'Close Game',        desc:'Score within 7 points. Every snap could swing it. Sideline holds its breath.' },
   ];
 
   const MEMES = [
@@ -1264,7 +1268,7 @@
       </div>`;
     document.getElementById('step-1').scrollIntoView({ behavior:'smooth', block:'start' });
   }
-  document.getElementById('reset-btn').addEventListener('click', resetAll);
+  // (reset-btn lived in the sticky bar which was removed — Try-another button still calls resetAll)
 
   // ────────────────────────────────────────────────────────
   // MODALS
