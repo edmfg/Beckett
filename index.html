@@ -288,6 +288,90 @@
   .reveal-actions{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;
     justify-content:center}
 
+  /* ───────── storyboard carousel ───────── */
+  .frame-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    z-index:1;opacity:0;transition:opacity .3s;pointer-events:none}
+  .frame-stage.on{opacity:1;pointer-events:auto}
+  .frame-stage img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* text-card frames (broadcast graphics) */
+  .fs-card{width:100%;height:100%;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:6%;text-align:center;
+    color:var(--ink);position:relative;overflow:hidden}
+  .fs-card.bg-red{background:
+    radial-gradient(ellipse 80% 100% at 50% 50%,rgba(255,45,45,.4),#0a0a0d 80%),
+    #0a0a0d}
+  .fs-card.bg-ink{background:linear-gradient(135deg,#15151a 0%,#0a0a0d 100%)}
+  .fs-card.bg-brand{background:
+    radial-gradient(circle at 30% 50%,rgba(74,140,255,.2),transparent 60%),
+    radial-gradient(circle at 70% 50%,rgba(255,138,61,.18),transparent 60%),
+    #0a0a0d}
+  .fs-kick{font-family:var(--cond);font-weight:700;font-size:clamp(11px,1.4vw,14px);
+    letter-spacing:.36em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  .fs-headline{font-family:var(--display);font-size:clamp(34px,5vw,72px);
+    text-transform:uppercase;letter-spacing:.02em;line-height:.92;margin-bottom:18px;
+    text-shadow:0 0 30px rgba(0,0,0,.6)}
+  .fs-headline .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .fs-sub{font-family:var(--cond);font-size:clamp(14px,1.8vw,20px);font-weight:500;
+    color:var(--chalk);letter-spacing:.04em;max-width:540px;line-height:1.35}
+  .fs-brand{display:flex;align-items:center;gap:18px;margin-top:8px}
+  .fs-brand img{width:auto;height:clamp(28px,4vw,46px);display:block;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  .fs-brand .x{font-family:var(--display);font-size:clamp(20px,3vw,30px);color:var(--mute)}
+
+  /* image overlay caption for image-type frames */
+  .frame-cap{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;
+    background:linear-gradient(180deg,transparent,rgba(0,0,0,.78) 60%);
+    font-family:var(--cond);font-weight:600;font-size:clamp(13px,1.6vw,16px);
+    letter-spacing:.18em;text-transform:uppercase;color:var(--chalk);z-index:2}
+  .frame-cap b{color:var(--accent);font-weight:700;margin-right:8px}
+  .frame-corner{position:absolute;top:14px;left:60px;padding:4px 8px;
+    background:rgba(0,0,0,.6);
+    font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--chalk);z-index:3}
+
+  .storyboard{max-width:1180px;margin:22px auto 0;
+    display:flex;align-items:center;gap:14px}
+  .sb-controls{display:flex;flex-direction:column;align-items:center;gap:6px;
+    min-width:78px;flex-shrink:0}
+  .sb-play{width:44px;height:44px;border-radius:50%;background:var(--accent);
+    color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;
+    transition:background .15s,transform .1s;line-height:1}
+  .sb-play:hover{background:#ff4242}
+  .sb-play:active{transform:scale(.95)}
+  .sb-time{font-family:var(--mono);font-size:11px;color:var(--mute);letter-spacing:.05em}
+
+  .sb-track{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;
+    min-width:0}
+  .sb-thumb{position:relative;cursor:pointer;background:#0a0a0d;
+    border:2px solid var(--line);aspect-ratio:16/9;overflow:hidden;
+    transition:border-color .15s,transform .15s}
+  .sb-thumb:hover{border-color:var(--mute)}
+  .sb-thumb.active{border-color:var(--accent);transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(255,45,45,.18)}
+  .sb-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .sb-thumb .sbt-card{width:100%;height:100%;display:flex;align-items:center;
+    justify-content:center;text-align:center;padding:6px;
+    background:linear-gradient(135deg,#15151a,#0a0a0d);
+    font-family:var(--display);font-size:11px;line-height:1.1;
+    text-transform:uppercase;letter-spacing:.04em;color:var(--chalk)}
+  .sbt-label{position:absolute;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,.75);padding:3px 6px;
+    font-family:var(--cond);font-weight:600;font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink);display:flex;justify-content:space-between;gap:4px}
+  .sbt-label .t{color:var(--accent);font-family:var(--mono);font-weight:500}
+
+  .sb-progress{position:absolute;left:0;bottom:0;height:2px;background:var(--accent);
+    width:0;transition:width .1s linear}
+  .sb-thumb.active .sb-progress{transition:width .08s linear}
+
+  @media(max-width:700px){
+    .sb-track{grid-template-columns:repeat(5,1fr);gap:5px}
+    .sbt-label{font-size:8px;padding:2px 4px}
+    .sb-controls{min-width:60px}
+    .sb-play{width:36px;height:36px;font-size:14px}
+  }
+
   /* ───────── direction input (regenerate with custom prompt) ───────── */
   .direct-panel{margin:34px auto 0;max-width:760px;
     border:1px solid var(--line);padding:22px 24px;background:#15151a}
@@ -400,8 +484,8 @@
   <div class="codename"><b>Beckett</b>codename · leap in</div>
   <div class="h-kick">Beckett · Q4 2026 · CFB Saturdays · BETA</div>
   <h1 class="h-title">
-    <span>When the game changes</span>
-    <span class="out">The ad changes</span>
+    <span>Live sports meets</span>
+    <span class="out">Live ads</span>
   </h1>
   <p class="h-sub">This concept shows how Gemini can meme-ify fan reactions to dramatic live college sports events. Custom ads would appear soon after the live moment.</p>
 
@@ -730,6 +814,264 @@
   }
 
   // ────────────────────────────────────────────────────────
+  // STORYBOARD — 5 frames of a :15 CTV spot
+  // ────────────────────────────────────────────────────────
+  // story arc: dude on couch -> selfie -> Gemini renders -> meme drops in group chat
+  const FRAMES = [
+    { id:'couch',   dur:3000, t:'0:00', label:'The play'    },
+    { id:'selfie',  dur:2000, t:'0:03', label:'Selfie'      },
+    { id:'render',  dur:3000, t:'0:05', label:'Gemini'      },
+    { id:'meme',    dur:4000, t:'0:08', label:'The meme'    },
+    { id:'chat',    dur:3000, t:'0:12', label:'Group chat'  },
+  ];
+  const TOTAL_MS = FRAMES.reduce((s,f) => s + f.dur, 0);
+
+  let carousel = { active: 0, playing: false, raf: null, frameStartT: 0, accumMs: 0 };
+
+  function buildFrames(moment, meme) {
+    const f0 = `
+      <div class="frame-stage" data-fi="0">
+        <img src="/images/moments/${moment.id}.jpg" alt="" style="filter:brightness(.65) contrast(1.1) saturate(1.1)">
+        <div class="frame-corner">LIVE · 4Q · 0:32</div>
+        <div style="position:absolute;top:14px;right:16px;z-index:3;
+          font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.16em;
+          color:#fff;background:rgba(0,0,0,.7);padding:6px 10px;display:flex;gap:10px">
+          <span style="color:#FF8200">VOLS <b style="margin-left:4px;font-family:var(--display)">24</b></span>
+          <span style="opacity:.5">·</span>
+          <span style="color:#A60C31">BAMA <b style="margin-left:4px;font-family:var(--display)">17</b></span>
+        </div>
+        <div class="frame-cap"><b>${moment.name.toUpperCase()}</b> ALABAMA TURNOVER · TENNESSEE BALL</div>
+      </div>`;
+
+    const phoneTpl = (inner) => `
+      <div class="fs-card bg-ink" style="padding:4%">
+        <div style="width:min(38%,200px);aspect-ratio:9/19;
+          background:#000;border-radius:24px;border:6px solid #1a1a1f;padding:14px;
+          box-shadow:0 20px 50px rgba(0,0,0,.6);
+          display:flex;flex-direction:column;gap:10px;color:#fff;font-family:var(--body)">
+          ${inner}
+        </div>
+      </div>`;
+
+    const f1 = `
+      <div class="frame-stage" data-fi="1">${phoneTpl(`
+        <div style="text-align:center;font-family:var(--cond);font-size:10px;
+          letter-spacing:.2em;color:#888;text-transform:uppercase">Front Camera</div>
+        <div style="flex:1;background:#0a0a0d;border-radius:8px;overflow:hidden;
+          display:flex;align-items:center;justify-content:center;position:relative">
+          <img src="/images/friend.jpg" alt="" style="width:100%;height:100%;object-fit:cover">
+          <div style="position:absolute;inset:0;border:2px dashed rgba(255,255,255,.5);
+            border-radius:8px;margin:14px"></div>
+        </div>
+        <button style="background:#fff;color:#000;border:none;border-radius:50%;
+          width:46px;height:46px;align-self:center;font-size:12px;font-weight:700;
+          font-family:var(--cond);letter-spacing:.1em">SNAP</button>
+        <div style="text-align:center;font-family:var(--cond);font-size:10px;
+          letter-spacing:.18em;color:#aaa;text-transform:uppercase">Meme-ify with Gemini</div>
+      `)}</div>`;
+
+    const f2 = `
+      <div class="frame-stage" data-fi="2">${phoneTpl(`
+        <div style="text-align:center;display:flex;flex-direction:column;gap:6px">
+          <div style="font-family:var(--cond);font-size:9px;letter-spacing:.22em;
+            color:#888;text-transform:uppercase">Gemini · Nano Banana Pro</div>
+          <div style="font-family:var(--display);font-size:14px;letter-spacing:.04em;
+            background:linear-gradient(90deg,${'var(--gem-a)'},${'var(--gem-b)'} 55%,${'var(--gem-c)'});
+            -webkit-background-clip:text;background-clip:text;color:transparent">Memifying…</div>
+        </div>
+        <div style="flex:1;background:#0a0a0d;border-radius:8px;overflow:hidden;
+          display:flex;align-items:center;justify-content:center;position:relative">
+          <img src="/images/friend.jpg" alt="" style="width:60%;height:60%;object-fit:cover;
+            border-radius:6px;opacity:.6">
+          <div style="position:absolute;width:34px;height:34px;border-radius:50%;
+            background:conic-gradient(from 0deg,${'var(--gem-a)'},${'var(--gem-b)'},${'var(--gem-c)'},${'var(--gem-a)'});
+            -webkit-mask:radial-gradient(circle 12px,transparent 98%,#000 100%);
+                    mask:radial-gradient(circle 12px,transparent 98%,#000 100%);
+            animation:spin 1.1s linear infinite"></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:#888;text-align:center">
+          template: <span style="color:#fff">${meme.id}</span>
+        </div>
+      `)}</div>`;
+
+    // Frame 3 is the actual generated ad — img + placeholder live inside this stage
+    const f3 = `
+      <div class="frame-stage" data-fi="3">
+        <img class="ad-img" id="ad-img" alt="${moment.name} × ${meme.name}" style="display:none">
+        <div class="ad-placeholder" id="ad-ph">
+          <div class="ph-kick">Beckett · awaiting Gemini render</div>
+          <div class="ph-formula">${moment.name}<br>× ${meme.name}</div>
+          <div class="ph-desc">${COMBO_COPY[`${moment.id}|${meme.id}`] || 'You, as ' + meme.name + ', in the moment after the ' + moment.name.toLowerCase() + '.'}</div>
+          <div class="ph-note">model: gemini-3-pro-image-preview</div>
+        </div>
+        <div class="frame-cap" style="z-index:5"><b>8 SECONDS LATER.</b> Friend × ${meme.name}, live-generated</div>
+      </div>`;
+
+    const f4 = `
+      <div class="frame-stage" data-fi="4">${phoneTpl(`
+        <div style="display:flex;align-items:center;gap:6px;font-family:var(--body);
+          font-size:11px;color:#fff;border-bottom:1px solid #222;padding-bottom:6px">
+          <span style="width:22px;height:22px;border-radius:50%;background:#FF8200;
+            display:flex;align-items:center;justify-content:center;font-weight:700;
+            font-size:10px;color:#000">V</span>
+          <span style="font-weight:600">Vols Group Chat</span>
+          <span style="margin-left:auto;color:#666;font-size:9px">7 online</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px;
+          font-size:10px;line-height:1.3;overflow:hidden">
+          <div style="background:#0a4a8a;color:#fff;align-self:flex-end;
+            padding:4px 8px;border-radius:10px 10px 2px 10px;max-width:80%">
+            <img src="/images/ads/${moment.id}-${meme.id}.jpg" alt=""
+              style="width:100%;border-radius:6px;display:block;margin-bottom:3px"
+              onerror="this.style.display='none'">
+            <div style="font-size:9px">just made this</div>
+          </div>
+          <div style="background:#222;color:#fff;align-self:flex-start;
+            padding:4px 8px;border-radius:10px 10px 10px 2px;max-width:70%">
+            <div style="font-size:8px;color:#888;margin-bottom:1px">MIKE</div>
+            LMAOOOOO 💀
+          </div>
+          <div style="background:#222;color:#fff;align-self:flex-start;
+            padding:4px 8px;border-radius:10px 10px 10px 2px;max-width:70%">
+            <div style="font-size:8px;color:#888;margin-bottom:1px">DAVE</div>
+            saving this forever
+          </div>
+          <div style="background:#222;color:#fff;align-self:flex-start;
+            padding:4px 8px;border-radius:10px 10px 10px 2px;max-width:70%">
+            <div style="font-size:8px;color:#888;margin-bottom:1px">JOSH</div>
+            🔥🔥🔥
+          </div>
+        </div>
+      `)}
+      <div style="position:absolute;left:0;right:0;bottom:0;padding:18px;
+        background:linear-gradient(180deg,transparent,rgba(0,0,0,.92) 50%);
+        display:flex;align-items:flex-end;justify-content:space-between;gap:14px;z-index:3">
+        <div>
+          <div style="font-family:var(--cond);font-weight:700;font-size:11px;
+            letter-spacing:.3em;color:var(--accent);text-transform:uppercase;margin-bottom:4px">Beckett</div>
+          <div style="font-family:var(--display);font-size:clamp(18px,2.6vw,32px);
+            text-transform:uppercase;letter-spacing:.02em;color:var(--ink);line-height:.95">
+            Already in the chat.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <img src="/assets/gemini-logo.png" alt="" style="height:clamp(16px,2vw,22px);width:auto">
+          <span style="font-family:var(--display);font-size:14px;color:var(--mute)">×</span>
+          <img src="/assets/nbcsn-cfb-logo.png" alt="" style="height:clamp(26px,3.5vw,38px);width:auto">
+        </div>
+      </div>
+      </div>`;
+
+    return f0 + f1 + f2 + f3 + f4;
+  }
+
+  function buildThumbs(moment, meme) {
+    return FRAMES.map((f, i) => {
+      let inner;
+      if (f.id === 'couch') {
+        inner = `<img src="/images/moments/${moment.id}.jpg" alt="" style="filter:brightness(.7)">`;
+      } else if (f.id === 'meme') {
+        inner = `<img src="/images/ads/${moment.id}-${meme.id}.jpg" alt=""
+          onerror="this.parentElement.querySelector('.sbt-card').style.display='flex'">
+          <div class="sbt-card" style="display:none;position:absolute;inset:0">${meme.name}</div>`;
+      } else if (f.id === 'selfie') {
+        inner = `<img src="/images/friend.jpg" alt="" style="filter:brightness(.85)">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+            font-family:var(--cond);font-weight:700;font-size:10px;letter-spacing:.2em;color:#fff;
+            text-shadow:0 2px 6px rgba(0,0,0,.8)">SELFIE</div>`;
+      } else if (f.id === 'render') {
+        inner = `<div class="sbt-card" style="background:linear-gradient(135deg,#15151a,#0a0a0d)">
+          <span style="background:linear-gradient(90deg,var(--gem-a),var(--gem-b) 55%,var(--gem-c));
+            -webkit-background-clip:text;background-clip:text;color:transparent">Gemini</span></div>`;
+      } else if (f.id === 'chat') {
+        inner = `<div class="sbt-card" style="background:#15151a">CHAT 💬</div>`;
+      }
+      return `
+        <button class="sb-thumb${i===0?' active':''}" data-i="${i}" aria-label="${f.label}">
+          ${inner}
+          <div class="sbt-label"><span>${f.label}</span><span class="t">${f.t}</span></div>
+          <div class="sb-progress"></div>
+        </button>`;
+    }).join('');
+  }
+
+  function setActiveFrame(i) {
+    carousel.active = i;
+    document.querySelectorAll('.frame-stage').forEach((s, idx) =>
+      s.classList.toggle('on', idx === i));
+    document.querySelectorAll('.sb-thumb').forEach((b, idx) => {
+      b.classList.toggle('active', idx === i);
+      const p = b.querySelector('.sb-progress');
+      if (p) p.style.width = (idx < i ? '100%' : '0%');
+    });
+    // visibility on meme frame: ad-img if loaded, placeholder if not, overlay during render
+    const onMemeFrame = (i === 3);
+    const adImg = document.getElementById('ad-img');
+    const adPh  = document.getElementById('ad-ph');
+    const ov    = document.getElementById('render-ov');
+    const loaded = adImg && adImg.src && !adImg.dataset.failed;
+    const loading = adImg && adImg.dataset.loading === '1';
+    if (adImg) adImg.style.display = (onMemeFrame && loaded) ? 'block' : 'none';
+    if (adPh)  adPh.style.display  = (onMemeFrame && !loaded) ? 'flex' : 'none';
+    if (ov)    ov.classList.toggle('on', onMemeFrame && loading);
+    updateTime();
+  }
+
+  function totalToMs(i) {
+    let s = 0; for (let k = 0; k < i; k++) s += FRAMES[k].dur; return s;
+  }
+  function updateTime() {
+    const t = totalToMs(carousel.active) + carousel.accumMs;
+    const cur = Math.min(t, TOTAL_MS);
+    const fmt = (ms) => `0:${String(Math.floor(ms/1000)).padStart(2,'0')}`;
+    const el = document.getElementById('sb-time');
+    if (el) el.textContent = `${fmt(cur)} / 0:15`;
+  }
+
+  function tick() {
+    if (!carousel.playing) return;
+    const now = performance.now();
+    const elapsed = now - carousel.frameStartT;
+    const frame = FRAMES[carousel.active];
+    const pct = Math.min(1, elapsed / frame.dur);
+    const thumb = document.querySelector(`.sb-thumb[data-i="${carousel.active}"] .sb-progress`);
+    if (thumb) thumb.style.width = (pct * 100) + '%';
+    carousel.accumMs = elapsed;
+    updateTime();
+    if (pct >= 1) {
+      const next = (carousel.active + 1) % FRAMES.length;
+      carousel.frameStartT = now;
+      carousel.accumMs = 0;
+      setActiveFrame(next);
+      if (next === 0) {
+        // looped back; pause so user has a beat
+        pauseCarousel();
+        return;
+      }
+    }
+    carousel.raf = requestAnimationFrame(tick);
+  }
+
+  function playCarousel() {
+    if (carousel.playing) return;
+    carousel.playing = true;
+    carousel.frameStartT = performance.now() - carousel.accumMs;
+    document.getElementById('sb-play').textContent = '❚❚';
+    carousel.raf = requestAnimationFrame(tick);
+  }
+  function pauseCarousel() {
+    carousel.playing = false;
+    if (carousel.raf) cancelAnimationFrame(carousel.raf);
+    const btn = document.getElementById('sb-play'); if (btn) btn.textContent = '▶';
+  }
+  function jumpFrame(i) {
+    pauseCarousel();
+    carousel.accumMs = 0;
+    setActiveFrame(i);
+    const thumb = document.querySelector(`.sb-thumb[data-i="${i}"] .sb-progress`);
+    if (thumb) thumb.style.width = '0%';
+  }
+
+  // ────────────────────────────────────────────────────────
   // REVEAL
   // ────────────────────────────────────────────────────────
   function triggerReveal() {
@@ -753,27 +1095,28 @@
         <div class="ref-arrow">→</div>
         <div class="ctv-wrap">
           <div class="ctv-frame" id="ctv-frame">
-            <img class="ad-img" id="ad-img"
-                 alt="${moment.name} × ${meme.name}"
-                 style="display:none">
-            <div class="ad-placeholder" id="ad-ph">
-              <div class="ph-kick">Beckett · awaiting Gemini render</div>
-              <div class="ph-formula">${moment.name}<br>× ${meme.name}</div>
-              <div class="ph-desc">${copy}</div>
-              <div class="ph-note">model: gemini-3-pro-image-preview · key: GEMINI_KEY</div>
-            </div>
-            <div class="render-overlay on" id="render-ov">
+            ${buildFrames(moment, meme)}
+            <div class="render-overlay" id="render-ov" style="z-index:6">
               <div class="spinner"></div>
               <div class="render-msg"><span class="gem">Gemini</span> · rendering your ad…</div>
             </div>
           </div>
           <div class="ctv-stand"></div>
           <div class="ctv-stand-base"></div>
+          <div class="storyboard">
+            <div class="sb-controls">
+              <button class="sb-play" id="sb-play" aria-label="Play / pause">▶</button>
+              <span class="sb-time" id="sb-time">0:00 / 0:15</span>
+            </div>
+            <div class="sb-track" id="sb-track">
+              ${buildThumbs(moment, meme)}
+            </div>
+          </div>
         </div>
       </div>
       <div class="reveal-meta">
         <div class="caption" id="ad-caption"><span class="em">${moment.name} × ${meme.name}.</span> ${caption}</div>
-        <div class="gem-lockup"><span class="dot"></span> Powered by Gemini · Nano Banana Pro</div>
+        <div class="gem-lockup"><span class="dot"></span> Powered by Gemini · Nano Banana Pro · :15 spot</div>
       </div>
       <div class="reveal-actions">
         <button class="cta-primary" id="again-btn">Try another combination →</button>
@@ -800,7 +1143,17 @@
       const txt = document.getElementById('direct-input').value.trim();
       regenerate(txt);
     });
+    document.getElementById('sb-play').addEventListener('click', () => {
+      if (carousel.playing) pauseCarousel(); else playCarousel();
+    });
+    document.querySelectorAll('.sb-thumb').forEach(btn => {
+      btn.addEventListener('click', () => jumpFrame(parseInt(btn.dataset.i, 10)));
+    });
     bindModalOpens();
+
+    // initialize carousel at frame 0
+    carousel = { active: 0, playing: false, raf: null, frameStartT: 0, accumMs: 0 };
+    setActiveFrame(0);
 
     // scroll the reveal into view
     setTimeout(() => {
@@ -810,25 +1163,31 @@
     // static-first: try the pre-rendered image; on miss, fall back to live /api/render
     clearTimeout(renderTimer);
     loadAd({ direction: '' });
+
+    // autoplay shortly after — gives the user a beat to see frame 0
+    setTimeout(() => { if (!carousel.playing) playCarousel(); }, 1200);
   }
 
   function loadAd({ direction }) {
     const myKey = `${pickedMoment}|${pickedMeme}`;
-    const overlay = document.getElementById('render-ov');
-    if (overlay) overlay.classList.add('on');
+    const img = document.getElementById('ad-img');
+    if (img) { img.dataset.failed = ''; img.dataset.loading = '1'; }
+    setActiveFrame(carousel.active); // refresh overlay visibility
 
     const onSuccess = (src) => {
       if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
       const img = document.getElementById('ad-img');
       img.src = src;
-      img.style.display = 'block';
-      document.getElementById('ad-ph').style.display = 'none';
-      if (overlay) overlay.classList.remove('on');
+      img.dataset.loading = '';
+      img.dataset.failed  = '';
+      setActiveFrame(carousel.active);
     };
     const onFail = (err) => {
       if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
       console.error('[beckett] render error:', err);
-      if (overlay) overlay.classList.remove('on');
+      const img = document.getElementById('ad-img');
+      if (img) { img.dataset.loading = ''; img.dataset.failed = '1'; }
+      setActiveFrame(carousel.active);
       const cap = document.getElementById('ad-caption');
       if (cap && !cap.dataset.warned) {
         cap.innerHTML += ' <span style="color:var(--mute)">· live render unavailable</span>';
@@ -869,11 +1228,13 @@
     btn.disabled = true; input.disabled = true;
     const prev = btn.textContent;
     btn.textContent = 'Rendering…';
+    // jump to the meme frame so the user sees the render in progress
+    jumpFrame(3);
     loadAd({ direction });
-    // re-enable after the live call settles — listen to overlay
-    const ov = document.getElementById('render-ov');
+    // re-enable when ad-img loading flag clears
+    const img = document.getElementById('ad-img');
     const wait = setInterval(() => {
-      if (!ov || !ov.classList.contains('on')) {
+      if (!img || img.dataset.loading !== '1') {
         clearInterval(wait);
         btn.disabled = false; input.disabled = false;
         btn.textContent = prev;
@@ -882,6 +1243,8 @@
   }
 
   function resetAll() {
+    pauseCarousel();
+    carousel = { active: 0, playing: false, raf: null, frameStartT: 0, accumMs: 0 };
     pickedMoment = null;
     pickedMeme   = null;
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
