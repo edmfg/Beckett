@@ -62,12 +62,53 @@
 
   /* ───────── hero — tunnel ───────── */
   .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
-    padding:0 6vw;position:relative;
-    background:
-      radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.25),transparent 70%);}
-  .hero::before{content:"";position:absolute;inset:0;
+    padding:0 6vw;position:relative;background:var(--bg);isolation:isolate;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;z-index:0;
     background:linear-gradient(180deg,#000 0%,transparent 22%,transparent 78%,#000 100%);
     pointer-events:none}
+  /* breathing red radial glow at the bottom — slow heartbeat */
+  .hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.32),transparent 70%);
+    animation:hero-breathe 6.5s ease-in-out infinite;will-change:opacity}
+  @keyframes hero-breathe{0%,100%{opacity:.7}50%{opacity:1}}
+  /* keep all hero content above the pulsing layers */
+  .hero > *{position:relative;z-index:1}
+
+  /* floating embers — 12 small particles drifting up from below */
+  .embers{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .embers span{position:absolute;bottom:-12px;width:4px;height:4px;border-radius:50%;
+    background:radial-gradient(circle,#ff8a3d 0%,rgba(255,138,61,.4) 50%,transparent 80%);
+    opacity:0;animation:ember-rise linear infinite;will-change:transform,opacity}
+  @keyframes ember-rise{
+    0%{transform:translate3d(0,0,0) scale(.8);opacity:0}
+    8%{opacity:.85}
+    90%{opacity:.4}
+    100%{transform:translate3d(var(--dx,0),-105vh,0) scale(1.2);opacity:0}
+  }
+  .embers span:nth-child(1){left:5%; animation-duration:14s;animation-delay:-1s; --dx:18px}
+  .embers span:nth-child(2){left:12%;animation-duration:11s;animation-delay:-4s; --dx:-22px;width:3px;height:3px}
+  .embers span:nth-child(3){left:20%;animation-duration:16s;animation-delay:-7s; --dx:30px}
+  .embers span:nth-child(4){left:28%;animation-duration:12s;animation-delay:-2s; --dx:-14px;width:3px;height:3px}
+  .embers span:nth-child(5){left:36%;animation-duration:15s;animation-delay:-9s; --dx:24px}
+  .embers span:nth-child(6){left:44%;animation-duration:13s;animation-delay:-5s; --dx:-28px;width:5px;height:5px}
+  .embers span:nth-child(7){left:54%;animation-duration:17s;animation-delay:-3s; --dx:20px}
+  .embers span:nth-child(8){left:62%;animation-duration:12s;animation-delay:-8s; --dx:-18px;width:3px;height:3px}
+  .embers span:nth-child(9){left:70%;animation-duration:14s;animation-delay:-6s; --dx:32px}
+  .embers span:nth-child(10){left:78%;animation-duration:16s;animation-delay:-1s;--dx:-24px;width:5px;height:5px}
+  .embers span:nth-child(11){left:86%;animation-duration:11s;animation-delay:-10s;--dx:16px}
+  .embers span:nth-child(12){left:93%;animation-duration:15s;animation-delay:-4s; --dx:-20px;width:3px;height:3px}
+
+  /* LIVE word pulse — subtle red glow oscillation on the headline */
+  .live-pulse{animation:live-glow 2.8s ease-in-out infinite;will-change:text-shadow}
+  @keyframes live-glow{
+    0%,100%{text-shadow:0 0 30px rgba(255,45,45,.3)}
+    50%{text-shadow:0 0 55px rgba(255,45,45,.75),0 0 90px rgba(255,45,45,.35)}
+  }
+
+  /* honor reduced-motion preferences */
+  @media (prefers-reduced-motion: reduce){
+    .hero::after,.embers span,.live-pulse{animation:none !important}
+  }
   .h-kick{font-family:var(--cond);font-size:clamp(14px,1.6vw,18px);font-weight:600;
     letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
     margin-bottom:18px;position:relative}
@@ -553,11 +594,15 @@
 
 <!-- ───────── HERO ───────── -->
 <div class="hero">
+  <div class="embers" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
   <div class="codename"><b class="beckett-mark" data-tip="Named for Sam Beckett — NBC's Quantum Leap protagonist who leaps directly into other people's most interesting moments. Beckett puts you in the ad the same way.">Beckett</b>codename · leap in</div>
   <div class="h-kick">Beckett · Q4 2026 · CFB Saturdays · BETA</div>
   <h1 class="h-title">
-    <span>Live sports</span>
-    <span>Meets <span class="out">live ads</span></span>
+    <span><span class="live-pulse">Live</span> sports</span>
+    <span>Meets <span class="out"><span class="live-pulse">live</span> ads</span></span>
   </h1>
   <p class="h-sub">A concept for how Gemini-built creative variants can be matched to dramatic live college sports moments. Ads are pre-produced ahead of broadcast and served contextually — matched to the moment, not made in it.</p>
 
