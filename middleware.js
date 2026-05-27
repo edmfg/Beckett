@@ -3,7 +3,7 @@
 // the gate page itself, and /api/auth to pass through without a cookie.
 
 export const config = {
-  matcher: '/((?!gate\\.html|api/auth|assets/|images/|favicon|_vercel/|robots\\.txt).*)',
+  matcher: '/((?!gate\\.html|api/|assets/|images/|favicon|_vercel/|robots\\.txt).*)',
 };
 
 export default function middleware(req) {

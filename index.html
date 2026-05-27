@@ -64,12 +64,14 @@
   .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
     padding:0 6vw;position:relative;background:#000;isolation:isolate;overflow:hidden}
   /* YouTube video bg — Tenn vs Bama 2022 highlights, autoplay muted loop */
-  .video-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  /* poster fallback so something always shows even if the iframe is blocked */
+  .video-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:url(https://i.ytimg.com/vi/ij8JB47XbZA/maxresdefault.jpg) center/cover no-repeat #000}
   .video-bg iframe{position:absolute;top:50%;left:50%;
     transform:translate(-50%,-50%);
     width:max(100%,177.78vh);  /* 16:9 ratio against viewport height */
     height:max(100%,56.25vw);  /* 9:16 ratio against viewport width */
-    border:0;pointer-events:none}
+    border:0;pointer-events:none;background:#000}
   /* scrim — keeps text legible over the live video */
   .video-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:
