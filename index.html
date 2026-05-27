@@ -25,6 +25,17 @@
   button{font-family:inherit;background:none;border:none;color:inherit;cursor:pointer}
 
   /* ───────── topbar (in flow, sits above hero) ───────── */
+  /* ───────── pre-produced notice banner (top of page) ───────── */
+  .notice-banner{position:relative;z-index:6;
+    background:#0a0a0d;border-bottom:1px solid var(--line);
+    padding:11px 6vw;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .notice-banner .nb-tag{font-family:var(--cond);font-weight:700;font-size:11px;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+    border:1px solid var(--accent);padding:3px 8px;flex-shrink:0}
+  .notice-banner .nb-msg{font-family:var(--body);font-size:13px;color:var(--chalk);
+    line-height:1.4;flex:1;min-width:0}
+  .notice-banner .nb-msg b{color:var(--ink);font-weight:600}
+
   .topbar{position:absolute;top:0;left:0;right:0;z-index:5;
     display:flex;align-items:center;justify-content:space-between;
     padding:22px 6vw;gap:18px}
@@ -487,6 +498,11 @@
 </head>
 <body>
 
+<div class="notice-banner" role="note">
+  <span class="nb-tag">Note</span>
+  <span class="nb-msg"><b>All ads are pre-produced.</b> They appear contextually based on the live sport moment — they are not generated in real time. The interactive demo below uses Gemini to render one variant per combination as a visualization of what the pre-produced creative would look like.</span>
+</div>
+
 <header class="topbar">
   <div class="brand">
     <img class="brand-gemini" src="/assets/gemini-logo.png" alt="Gemini">
@@ -505,7 +521,7 @@
     <span>Live sports meets</span>
     <span class="out">Live ads</span>
   </h1>
-  <p class="h-sub">This concept shows how Gemini can meme-ify fan reactions to dramatic live college sports events. Custom ads would appear soon after the live moment.</p>
+  <p class="h-sub">A concept for how Gemini-built creative variants can be matched to dramatic live college sports moments. Ads are pre-produced ahead of broadcast and served contextually — matched to the moment, not made in it.</p>
 
   <div class="h-cta">
     <a class="cta-primary" href="#step-1">Try it →</a>
@@ -671,20 +687,26 @@
 <div class="modal" id="modal-made" role="dialog" aria-modal="true" aria-labelledby="made-title">
   <div class="modal-body">
     <button class="modal-close" data-close>×</button>
-    <div class="modal-kick">Production stack · May 2026</div>
-    <h2 class="modal-title" id="made-title">Made with the real Gemini API</h2>
+    <div class="modal-kick">Production pipeline · pre-produced, not live-generated</div>
+    <h2 class="modal-title" id="made-title">How the creative gets built</h2>
+
+    <p style="font-family:var(--body);font-size:14px;color:var(--chalk);line-height:1.6;margin-bottom:22px">
+      <b style="color:var(--ink)">All ads are pre-produced ahead of broadcast.</b>
+      A brand briefs Gemini on a library of creative variants — one per moment-type and meme combination — and Gemini renders the full library days before kickoff. At broadcast, a trigger classifier matches the live sport moment to the right variant and serves it. The contextual magic is in the <em>matching</em>, not in any real-time generation.
+    </p>
 
     <dl class="made-row">
       <dt>Model</dt><dd>Nano Banana Pro — <code>gemini-3-pro-image-preview</code></dd>
-      <dt>Inputs</dt><dd>Meme template + friend face + team jersey + stadium (up to 14 reference images per render)</dd>
-      <dt>Render time</dt><dd>&lt; 10 seconds per image</dd>
-      <dt>Cost at scale</dt><dd>~$0.13 per image · pennies per impression at production volume</dd>
+      <dt>Inputs</dt><dd>Meme template + friend / hero face + team colors + stadium (up to 14 reference images per render)</dd>
+      <dt>Render time</dt><dd>~8 seconds per image — fast enough to iterate a library of 50–200 variants in a single agency session</dd>
+      <dt>Cost</dt><dd>~$0.13 per image · the full library typically lands under $50 in compute</dd>
       <dt>Text rendering</dt><dd>Native — handles meme captions (Doge, "this is fine," etc.) without OCR or compositing tricks</dd>
-      <dt>Workflow</dt><dd>Iterate on Nano Banana 2 (faster, cheaper) → final render on Nano Banana Pro</dd>
+      <dt>Iteration</dt><dd>Prompt-test on Nano Banana 2 (faster, cheaper) → final render on Nano Banana Pro</dd>
+      <dt>This demo</dt><dd>Uses the live API so each interaction renders fresh — a way to <em>visualize</em> what one variant of the pre-produced library would look like</dd>
     </dl>
 
     <div class="made-foot">
-      This is not a mockup of fake tech. The same model and the same pipeline ships in production. Docs: <a href="https://ai.google.dev/gemini-api/docs/image-generation" target="_blank" rel="noopener">ai.google.dev/gemini-api</a>.
+      Same Gemini API and the same model that ships in production. Docs: <a href="https://ai.google.dev/gemini-api/docs/image-generation" target="_blank" rel="noopener">ai.google.dev/gemini-api</a>.
     </div>
   </div>
 </div>
@@ -1142,7 +1164,7 @@
             maxlength="500"></textarea>
           <button class="direct-btn" type="submit" id="direct-btn">Regenerate →</button>
         </form>
-        <div class="direct-help">Calls Gemini live with your direction appended to the prompt. <b>~8 seconds.</b> Each custom render is fresh (not cached).</div>
+        <div class="direct-help">Calls Gemini live to preview a custom variant — <b>~8 seconds.</b> In production, ads are pre-produced ahead of broadcast; this is a visualization tool, not the runtime.</div>
       </div>
     `;
 
