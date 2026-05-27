@@ -83,8 +83,8 @@
     background:radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.32),transparent 70%);
     animation:hero-breathe 6.5s ease-in-out infinite;will-change:opacity}
   @keyframes hero-breathe{0%,100%{opacity:.55}50%{opacity:.85}}
-  /* keep all hero content above the pulsing layers */
-  .hero > *{position:relative;z-index:4}
+  /* keep hero content above the bg/scrim/pulse layers (exclude the bg layers themselves) */
+  .hero > *:not(.video-bg):not(.video-scrim){position:relative;z-index:4}
 
   /* LIVE word pulse — subtle red glow oscillation on the headline */
   .live-pulse{animation:live-glow 2.8s ease-in-out infinite;will-change:text-shadow}
@@ -674,34 +674,6 @@
     </div>
   </section>
 
-  <!-- BUILT WITH -->
-  <section id="built">
-    <div class="s-head">
-      <div class="s-num">04</div>
-      <div class="s-title">Built for broadcast speed</div>
-    </div>
-    <div class="built">
-      <div>
-        <p>This isn't a mockup of fake tech. Every image you see on this site is generated <em>live</em> by the production Gemini API — the same stack a creative team would run during the game.</p>
-        <p>Nano Banana Pro (<code style="font-family:var(--mono);font-size:12px;background:#15151a;padding:2px 6px;border:1px solid var(--line)">gemini-3-pro-image-preview</code>) renders multi-reference compositions — meme template + friend face + team jersey + stadium — in under 10 seconds, at pennies per image. The format is the product.</p>
-        <button class="cta-ghost" data-open="made">How it's made →</button>
-      </div>
-      <ol class="beats">
-        <li>
-          <div class="b-title">The format is the product</div>
-          <div class="b-body">Live Contextual isn't a tactic. It's a new creative category — ads that change because the game changed.</div>
-        </li>
-        <li>
-          <div class="b-title">Gemini is uniquely built for this</div>
-          <div class="b-body">Nano Banana renders meme-grade contextual creative at broadcast speed. No other model ships at this latency.</div>
-        </li>
-        <li>
-          <div class="b-title">Google + NBCU + CFB is the right pilot</div>
-          <div class="b-body">High trigger volume. Meme-dense audience. A 4Q26 beta window to learn, before NBA, NFL, and MLB scale in 2027.</div>
-        </li>
-      </ol>
-    </div>
-  </section>
 </div>
 
 <footer>
@@ -1002,6 +974,11 @@
     const f4 = `
       <div class="frame-stage" data-fi="4">
         <img src="/images/frames/chat.jpg" alt="Phone showing group chat with the meme">
+        <img src="/images/ads/${moment.id}-${meme.id}.jpg" alt=""
+          style="position:absolute;top:27%;left:46.5%;width:14%;aspect-ratio:4/3;
+            border-radius:6px;object-fit:cover;z-index:2;
+            box-shadow:0 2px 8px rgba(0,0,0,.4)"
+          onerror="this.style.display='none'">
         <div style="position:absolute;left:0;right:0;bottom:0;padding:18px;
           background:linear-gradient(180deg,transparent,rgba(0,0,0,.92) 65%);
           display:flex;align-items:flex-end;justify-content:space-between;gap:14px;z-index:3">
