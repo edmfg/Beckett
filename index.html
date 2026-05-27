@@ -27,9 +27,15 @@
   /* ───────── topbar (in flow, sits above hero) ───────── */
   .topbar{position:absolute;top:0;left:0;right:0;z-index:5;
     display:flex;align-items:center;justify-content:space-between;
-    padding:28px 6vw}
+    padding:22px 6vw;gap:18px}
+  .brand{display:flex;align-items:center;gap:18px;min-width:0}
+  .brand-logo{height:56px;width:auto;display:block;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  @media(max-width:700px){.brand-logo{height:44px}}
   .wordmark{font-family:var(--cond);font-weight:700;font-size:14px;
-    letter-spacing:.28em;text-transform:uppercase;color:var(--chalk)}
+    letter-spacing:.28em;text-transform:uppercase;color:var(--chalk);
+    padding-left:18px;border-left:1px solid var(--line);line-height:1.3}
+  @media(max-width:700px){.wordmark{display:none}}
   .wordmark .gem{
     background:linear-gradient(90deg,var(--gem-a),var(--gem-b) 55%,var(--gem-c));
     -webkit-background-clip:text;background-clip:text;color:transparent}
@@ -320,7 +326,10 @@
 <body>
 
 <header class="topbar">
-  <div class="wordmark"><span class="gem">GEMINI</span> × NBCU · LIVE CONTEXTUAL</div>
+  <div class="brand">
+    <img class="brand-logo" src="/assets/nbcsn-cfb-logo.png" alt="NBC Sports Network College Football">
+    <div class="wordmark"><span class="gem">GEMINI</span> × NBCU<br>LIVE CONTEXTUAL</div>
+  </div>
   <button class="deal-btn" data-open="terms">See the deal terms →</button>
 </header>
 
