@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<title>Beckett — Gemini × NBCU Live Contextual</title>
+<meta name="description" content="Leap into the ad. Beckett turns a CFB turnover into a meme of your friend before the next snap. A Gemini × NBCU pilot for Q4 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f; --ink:#ffffff; --mute:#9a9aa2;
+    --accent:#ff2d2d; --chalk:#f2f0e6;
+    --line:#2a2a30;
+    --gem-a:#4a8cff; --gem-b:#8a5cff; --gem-c:#ff8a3d;
+    --display:'Anton',sans-serif; --cond:'Barlow Condensed',sans-serif;
+    --body:'Barlow',sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;background:none;border:none;color:inherit;cursor:pointer}
+
+  /* ───────── topbar (in flow, sits above hero) ───────── */
+  .topbar{position:absolute;top:0;left:0;right:0;z-index:5;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:28px 6vw}
+  .wordmark{font-family:var(--cond);font-weight:700;font-size:14px;
+    letter-spacing:.28em;text-transform:uppercase;color:var(--chalk)}
+  .wordmark .gem{
+    background:linear-gradient(90deg,var(--gem-a),var(--gem-b) 55%,var(--gem-c));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .deal-btn{font-family:var(--cond);font-weight:600;font-size:13px;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--ink);
+    border:1.5px solid var(--line);padding:11px 18px;
+    transition:border-color .2s,background .2s}
+  .deal-btn:hover{border-color:var(--accent);background:rgba(255,45,45,.06)}
+
+  /* ───────── hero — tunnel ───────── */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:0 6vw;position:relative;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.25),transparent 70%),
+      repeating-linear-gradient(90deg,transparent 0 11.1%,rgba(255,255,255,.04) 11.1% 11.2%);}
+  .hero::before{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,#000 0%,transparent 22%,transparent 78%,#000 100%);
+    pointer-events:none}
+  .h-kick{font-family:var(--cond);font-size:clamp(14px,1.6vw,18px);font-weight:600;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:18px;position:relative}
+  .h-title{font-family:var(--display);font-size:clamp(72px,14vw,210px);
+    line-height:.86;letter-spacing:.005em;text-transform:uppercase;position:relative;
+    text-shadow:0 0 60px rgba(255,45,45,.3)}
+  .h-title span{display:block}
+  .h-title .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+  .h-sub{margin-top:28px;font-family:var(--cond);font-size:clamp(18px,2.2vw,24px);
+    font-weight:500;color:var(--chalk);max-width:640px;position:relative;line-height:1.35}
+
+  .formula{margin-top:36px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    position:relative}
+  .f-slot{font-family:var(--display);font-size:clamp(22px,3vw,34px);
+    letter-spacing:.04em;text-transform:uppercase;
+    padding:14px 22px;border:1.5px solid var(--line);min-width:200px;text-align:center;
+    color:var(--mute);transition:color .2s,border-color .2s,background .2s}
+  .f-slot.filled{color:var(--ink);border-color:var(--accent);background:rgba(255,45,45,.06)}
+  .f-op{font-family:var(--display);font-size:clamp(22px,3vw,34px);color:var(--mute)}
+  .f-eq{font-family:var(--display);font-size:clamp(22px,3vw,34px);color:var(--ink)}
+  .f-ad{font-family:var(--display);font-size:clamp(28px,3.6vw,42px);
+    color:var(--accent);letter-spacing:.04em}
+
+  .h-cta{margin-top:46px;display:flex;gap:14px;flex-wrap:wrap;position:relative}
+  .cta-primary{font-family:var(--cond);font-weight:700;font-size:15px;
+    letter-spacing:.24em;text-transform:uppercase;
+    padding:16px 28px;background:var(--accent);color:#fff;
+    transition:transform .15s,background .15s}
+  .cta-primary:hover{background:#ff4242;transform:translateY(-1px)}
+  .cta-ghost{font-family:var(--cond);font-weight:600;font-size:14px;
+    letter-spacing:.22em;text-transform:uppercase;
+    padding:16px 24px;border:1.5px solid var(--line);color:var(--ink);
+    transition:border-color .2s}
+  .cta-ghost:hover{border-color:var(--ink)}
+
+  .scroll-cue{position:absolute;bottom:30px;left:6vw;font-family:var(--cond);
+    font-size:13px;letter-spacing:.24em;color:var(--mute);text-transform:uppercase}
+  .codename{position:absolute;top:96px;right:6vw;z-index:5;
+    font-family:var(--cond);font-size:11px;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--mute);text-align:right;line-height:1.5}
+  .codename b{display:block;color:var(--chalk);font-weight:700;font-size:13px;
+    letter-spacing:.38em;margin-bottom:2px}
+  @media(max-width:700px){.codename{display:none}}
+
+  /* friend avatar — appears in placeholder + sticky bar */
+  .friend-av{width:42px;height:42px;border-radius:50%;background:#1a1a1f;
+    border:1.5px solid var(--line);overflow:hidden;flex-shrink:0;position:relative;
+    display:flex;align-items:center;justify-content:center}
+  .friend-av img{width:100%;height:100%;object-fit:cover;display:block}
+  .friend-av img.failed{display:none}
+  .friend-av .fa-ph{font-family:var(--cond);font-weight:700;font-size:11px;
+    letter-spacing:.18em;color:var(--mute)}
+  .friend-av.lg{width:160px;height:160px;border:2px solid var(--accent)}
+  .friend-av.lg .fa-ph{font-size:16px}
+
+  /* ───────── sticky formula bar (after hero) ───────── */
+  .stick-wrap{position:relative}
+  .stick-bar{position:sticky;top:0;z-index:4;
+    background:rgba(13,13,15,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:14px 6vw;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .stick-bar .sk{font-family:var(--cond);font-size:12px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--mute);margin-right:6px}
+  .stick-bar .pill{font-family:var(--cond);font-weight:600;font-size:12px;
+    letter-spacing:.18em;text-transform:uppercase;
+    padding:7px 12px;border:1px solid var(--line);color:var(--mute);min-width:130px;text-align:center}
+  .stick-bar .pill.filled{color:var(--ink);border-color:var(--accent);background:rgba(255,45,45,.06)}
+  .stick-bar .op{color:var(--mute);font-family:var(--display);font-size:18px}
+  .stick-bar .reset{margin-left:auto;font-family:var(--cond);font-weight:600;
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);
+    padding:7px 12px;border:1px solid var(--line);transition:color .2s,border-color .2s}
+  .stick-bar .reset:hover{color:var(--ink);border-color:var(--ink)}
+
+  /* ───────── sections ───────── */
+  section{padding:9vh 6vw;position:relative}
+  .s-head{display:flex;align-items:baseline;gap:24px;margin-bottom:8px;flex-wrap:wrap}
+  .s-num{font-family:var(--display);font-size:clamp(48px,7vw,100px);
+    line-height:.9;color:var(--accent);letter-spacing:.02em}
+  .s-title{font-family:var(--display);font-size:clamp(40px,5.5vw,78px);
+    line-height:.95;letter-spacing:.01em;text-transform:uppercase}
+  .s-sub{font-family:var(--cond);font-size:clamp(16px,1.6vw,19px);
+    color:var(--chalk);max-width:680px;margin-bottom:46px;line-height:1.4}
+
+  /* ───────── moment grid ───────── */
+  .grid{display:grid;gap:16px}
+  .grid-moments{grid-template-columns:repeat(4,1fr)}
+  .grid-memes{grid-template-columns:repeat(6,1fr)}
+  @media(max-width:1100px){.grid-moments{grid-template-columns:repeat(2,1fr)}
+    .grid-memes{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:600px){.grid-memes{grid-template-columns:repeat(2,1fr)}
+    .h-page{display:none}}
+
+  .card{position:relative;background:#15151a;border:1.5px solid var(--line);
+    padding:22px;cursor:pointer;
+    transition:border-color .2s,transform .15s,background .2s;
+    display:flex;flex-direction:column;gap:10px;min-height:170px}
+  .card:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .card.active{border-color:var(--accent);background:rgba(255,45,45,.08)}
+  .card.active::after{content:"SELECTED";position:absolute;top:10px;right:12px;
+    font-family:var(--cond);font-weight:700;font-size:10px;letter-spacing:.24em;
+    color:var(--accent)}
+  .card.hero-combo .ribbon{position:absolute;top:0;left:0;
+    font-family:var(--cond);font-weight:700;font-size:9px;letter-spacing:.22em;
+    color:var(--accent);background:rgba(255,45,45,.12);padding:4px 8px}
+
+  .c-icon{font-family:var(--display);font-size:42px;color:var(--accent);
+    line-height:1;letter-spacing:.02em}
+  .c-name{font-family:var(--display);font-size:22px;letter-spacing:.02em;
+    text-transform:uppercase;line-height:1}
+  .c-desc{font-family:var(--body);font-size:13px;color:var(--mute);line-height:1.4;
+    flex:1}
+  .c-tag{font-family:var(--cond);font-weight:600;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--chalk);
+    border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+
+  /* meme card variant */
+  .meme-thumb{aspect-ratio:1/1;background:#0a0a0d;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    position:relative;margin-bottom:6px}
+  .meme-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .meme-thumb img.failed{display:none}
+  .meme-ph{font-family:var(--display);font-size:32px;color:var(--mute);
+    text-align:center;padding:10px;letter-spacing:.04em;
+    background:repeating-linear-gradient(45deg,#0a0a0d 0 8px,#11111a 8px 16px);
+    width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+  .meme-card .c-name{font-size:18px}
+  .meme-card .c-desc{font-size:12px}
+
+  /* ───────── step 3 reveal ───────── */
+  .reveal{margin-top:20px}
+  .reveal-empty{padding:60px 30px;border:2px dashed var(--line);text-align:center}
+  .reveal-empty .e-kick{font-family:var(--cond);font-weight:600;font-size:13px;
+    letter-spacing:.28em;text-transform:uppercase;color:var(--mute);margin-bottom:14px}
+  .reveal-empty .e-msg{font-family:var(--display);font-size:clamp(28px,4vw,52px);
+    text-transform:uppercase;letter-spacing:.02em;color:var(--chalk)}
+
+  .ctv-frame{max-width:960px;margin:0 auto;position:relative;
+    background:#000;border:14px solid #1a1a1f;border-radius:6px;
+    box-shadow:0 0 0 1px #000,0 30px 80px rgba(0,0,0,.6),
+      0 0 120px rgba(255,45,45,.12);
+    aspect-ratio:16/9;overflow:hidden}
+  .ctv-frame::before{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 0%,transparent 80%,rgba(0,0,0,.4) 100%);
+    pointer-events:none;z-index:2}
+  .ctv-frame::after{content:"LIVE";position:absolute;top:14px;left:16px;
+    font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.22em;
+    color:#fff;background:var(--accent);padding:4px 8px;z-index:3}
+  .ctv-stand{width:120px;height:14px;margin:0 auto;background:#1a1a1f;
+    border-radius:0 0 6px 6px}
+  .ctv-stand-base{width:200px;height:6px;margin:2px auto 0;background:#1a1a1f;
+    border-radius:2px}
+
+  .ad-img{width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1}
+  .ad-img.failed{display:none}
+  .ad-placeholder{position:absolute;inset:0;z-index:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:40px;text-align:center;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 50%,rgba(255,45,45,.18),transparent 70%),
+      repeating-linear-gradient(45deg,#0a0a0d 0 14px,#11111a 14px 28px)}
+  .ph-kick{font-family:var(--cond);font-weight:600;font-size:12px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .ph-formula{font-family:var(--display);font-size:clamp(28px,4vw,52px);
+    text-transform:uppercase;letter-spacing:.02em;color:var(--ink);line-height:.95;
+    margin-bottom:14px}
+  .ph-friend{margin:14px 0 18px}
+  .ph-desc{font-family:var(--cond);font-size:clamp(14px,1.6vw,18px);
+    color:var(--chalk);max-width:520px;line-height:1.4}
+  .ph-note{margin-top:18px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.1em;color:var(--mute)}
+
+  .render-overlay{position:absolute;inset:0;z-index:4;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.88);gap:18px;
+    opacity:0;pointer-events:none;transition:opacity .25s}
+  .render-overlay.on{opacity:1;pointer-events:auto}
+  .spinner{width:48px;height:48px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--gem-a),var(--gem-b),var(--gem-c),var(--gem-a));
+    -webkit-mask:radial-gradient(circle 16px,transparent 98%,#000 100%);
+            mask:radial-gradient(circle 16px,transparent 98%,#000 100%);
+    animation:spin 1.1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .render-msg{font-family:var(--cond);font-weight:600;font-size:14px;
+    letter-spacing:.28em;text-transform:uppercase;color:var(--chalk)}
+  .render-msg .gem{
+    background:linear-gradient(90deg,var(--gem-a),var(--gem-b) 55%,var(--gem-c));
+    -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+
+  .reveal-meta{margin-top:24px;max-width:960px;margin-left:auto;margin-right:auto;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .caption{font-family:var(--cond);font-size:clamp(16px,1.8vw,20px);
+    color:var(--chalk);max-width:560px;line-height:1.4}
+  .caption .em{color:var(--ink);font-weight:600}
+  .gem-lockup{font-family:var(--cond);font-weight:700;font-size:13px;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--mute);
+    display:flex;align-items:center;gap:10px;white-space:nowrap}
+  .gem-lockup .dot{width:8px;height:8px;border-radius:50%;
+    background:linear-gradient(135deg,var(--gem-a),var(--gem-b),var(--gem-c))}
+  .reveal-actions{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;
+    justify-content:center}
+
+  /* ───────── built-with section ───────── */
+  .built{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+  @media(max-width:900px){.built{grid-template-columns:1fr}}
+  .built p{font-family:var(--body);font-size:15px;color:var(--chalk);
+    line-height:1.6;margin-bottom:14px;max-width:540px}
+  .beats{list-style:none;display:flex;flex-direction:column;gap:18px}
+  .beats li{padding-left:48px;position:relative}
+  .beats li::before{counter-increment:beat;content:counter(beat,decimal-leading-zero);
+    position:absolute;left:0;top:-2px;
+    font-family:var(--display);font-size:28px;color:var(--accent);line-height:1}
+  .beats{counter-reset:beat}
+  .beats .b-title{font-family:var(--cond);font-weight:700;font-size:14px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+  .beats .b-body{font-family:var(--body);font-size:14px;color:var(--mute);line-height:1.5}
+
+  /* ───────── footer ───────── */
+  footer{padding:50px 6vw 70px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  footer .fl{font-family:var(--cond);font-size:13px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--mute)}
+  footer .fl b{color:var(--chalk)}
+
+  /* ───────── modal ───────── */
+  .modal{position:fixed;inset:0;z-index:50;
+    background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+    display:flex;align-items:flex-start;justify-content:center;padding:6vh 4vw;
+    opacity:0;pointer-events:none;transition:opacity .2s;overflow-y:auto}
+  .modal.on{opacity:1;pointer-events:auto}
+  .modal-body{background:#0d0d0f;border:1px solid var(--line);
+    max-width:780px;width:100%;padding:42px 44px;position:relative}
+  .modal-close{position:absolute;top:14px;right:14px;
+    width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--cond);font-size:20px;color:var(--mute);
+    border:1px solid var(--line);transition:color .2s,border-color .2s}
+  .modal-close:hover{color:var(--ink);border-color:var(--ink)}
+  .modal-kick{font-family:var(--cond);font-weight:600;font-size:12px;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .modal-title{font-family:var(--display);font-size:clamp(32px,4vw,52px);
+    text-transform:uppercase;letter-spacing:.02em;line-height:.95;margin-bottom:28px}
+
+  .terms-grp{margin-bottom:26px}
+  .terms-grp h4{font-family:var(--cond);font-weight:700;font-size:12px;
+    letter-spacing:.26em;text-transform:uppercase;color:var(--chalk);
+    border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px}
+  .terms-grp ul{list-style:none}
+  .terms-grp li{font-family:var(--body);font-size:14px;color:var(--ink);
+    padding:6px 0 6px 22px;position:relative;line-height:1.5}
+  .terms-grp li::before{content:"·";position:absolute;left:6px;top:4px;
+    color:var(--accent);font-weight:700;font-size:18px}
+  .terms-grp li.hi{color:var(--accent);font-weight:600}
+  .terms-grp li .lbl{font-family:var(--cond);font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--mute);margin-right:8px;font-size:12px}
+
+  .made-row{display:grid;grid-template-columns:130px 1fr;gap:12px 18px;
+    margin-bottom:18px}
+  .made-row dt{font-family:var(--cond);font-weight:700;font-size:11px;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--mute);padding-top:3px}
+  .made-row dd{font-family:var(--body);font-size:14px;color:var(--ink);line-height:1.5}
+  .made-row dd code{font-family:var(--mono);font-size:12px;background:#15151a;
+    padding:2px 6px;border:1px solid var(--line)}
+  .made-foot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);
+    font-family:var(--body);font-size:13px;color:var(--chalk);line-height:1.6}
+  .made-foot a{color:var(--accent);border-bottom:1px solid currentColor}
+
+  /* ───────── utility ───────── */
+  .nudge{animation:nudge 1.4s ease-in-out infinite}
+  @keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark"><span class="gem">GEMINI</span> × NBCU · LIVE CONTEXTUAL</div>
+  <button class="deal-btn" data-open="terms">See the deal terms →</button>
+</header>
+
+<!-- ───────── HERO ───────── -->
+<div class="hero">
+  <div class="codename"><b>Beckett</b>codename · leap in</div>
+  <div class="h-kick">Beckett · Q4 2026 · CFB Saturdays · BETA</div>
+  <h1 class="h-title">
+    <span>When the game changes</span>
+    <span class="out">The ad changes</span>
+  </h1>
+  <p class="h-sub">Beckett leaps you into the ad. Gemini turns a CFB turnover into a meme of your friend before the next snap — a pilot for Q4 2026, NBCU College Football Saturdays.</p>
+
+  <div class="formula" id="hero-formula">
+    <div class="f-slot" data-slot="moment">MOMENT</div>
+    <div class="f-op">+</div>
+    <div class="f-slot" data-slot="meme">MEME</div>
+    <div class="f-eq">=</div>
+    <div class="f-ad">AD</div>
+  </div>
+
+  <div class="h-cta">
+    <a class="cta-primary" href="#step-1">Try it →</a>
+    <button class="cta-ghost" data-open="terms">Deal terms</button>
+  </div>
+
+  <div class="scroll-cue nudge">Scroll · 01 / 03</div>
+</div>
+
+<!-- ───────── STICKY FORMULA BAR + STEPS ───────── -->
+<div class="stick-wrap">
+  <div class="stick-bar" id="stick-bar">
+    <div class="friend-av" title="The friend who leaps into every ad">
+      <img src="/images/friend.jpg" alt="Friend" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
+      <div class="fa-ph" style="display:none">YOU</div>
+    </div>
+    <div class="sk">Beckett · live formula</div>
+    <div class="pill" data-stick="moment">Moment</div>
+    <div class="op">+</div>
+    <div class="pill" data-stick="meme">Meme</div>
+    <div class="op">=</div>
+    <div class="pill" data-stick="result" style="color:var(--accent);border-color:var(--accent);background:rgba(255,45,45,.06)">Ad</div>
+    <button class="reset" id="reset-btn">Reset</button>
+  </div>
+
+  <!-- STEP 1 — MOMENT -->
+  <section id="step-1">
+    <div class="s-head">
+      <div class="s-num">01</div>
+      <div class="s-title">Pick a moment</div>
+    </div>
+    <p class="s-sub">Every CFB Saturday produces 4–8 of these. Each triggers an ad break within 90 seconds. Gemini renders the creative before the next snap.</p>
+    <div class="grid grid-moments" id="moments-grid"></div>
+  </section>
+
+  <!-- STEP 2 — MEME -->
+  <section id="step-2">
+    <div class="s-head">
+      <div class="s-num">02</div>
+      <div class="s-title">Pick a meme</div>
+    </div>
+    <p class="s-sub">Gemini's Nano Banana Pro renders it in under 8 seconds. Friend's face composited into the meme, in the winning team's colors, against a contextual backdrop.</p>
+    <div class="grid grid-memes" id="memes-grid"></div>
+  </section>
+
+  <!-- STEP 3 — AD -->
+  <section id="step-3">
+    <div class="s-head">
+      <div class="s-num">03</div>
+      <div class="s-title">Your ad</div>
+    </div>
+    <p class="s-sub">This is what shows up in the CTV ad break, on the next pod break, on the same television your friend group is already watching.</p>
+
+    <div class="reveal" id="reveal">
+      <div class="reveal-empty" id="reveal-empty">
+        <div class="e-kick">Awaiting input</div>
+        <div class="e-msg">Pick a moment + meme above</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILT WITH -->
+  <section id="built">
+    <div class="s-head">
+      <div class="s-num">04</div>
+      <div class="s-title">Built for broadcast speed</div>
+    </div>
+    <div class="built">
+      <div>
+        <p>This isn't a mockup of fake tech. Every image you see on this site is generated <em>live</em> by the production Gemini API — the same stack a creative team would run during the game.</p>
+        <p>Nano Banana Pro (<code style="font-family:var(--mono);font-size:12px;background:#15151a;padding:2px 6px;border:1px solid var(--line)">gemini-3-pro-image-preview</code>) renders multi-reference compositions — meme template + friend face + team jersey + stadium — in under 10 seconds, at pennies per image. The format is the product.</p>
+        <button class="cta-ghost" data-open="made">How it's made →</button>
+      </div>
+      <ol class="beats">
+        <li>
+          <div class="b-title">The format is the product</div>
+          <div class="b-body">Live Contextual isn't a tactic. It's a new creative category — ads that change because the game changed.</div>
+        </li>
+        <li>
+          <div class="b-title">Gemini is uniquely built for this</div>
+          <div class="b-body">Nano Banana renders meme-grade contextual creative at broadcast speed. No other model ships at this latency.</div>
+        </li>
+        <li>
+          <div class="b-title">Google + NBCU + CFB is the right pilot</div>
+          <div class="b-body">High trigger volume. Meme-dense audience. A 4Q26 beta window to learn, before NBA, NFL, and MLB scale in 2027.</div>
+        </li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="fl"><b>BECKETT</b> — leap into the ad · Gemini × NBCU Live Contextual</div>
+  <div class="fl">WPP · GroupM · Google · NBCU</div>
+</footer>
+
+<!-- ───────── DEAL TERMS MODAL ───────── -->
+<div class="modal" id="modal-terms" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+  <div class="modal-body">
+    <button class="modal-close" data-close>×</button>
+    <div class="modal-kick">NBCU Pilot · 2026–27</div>
+    <h2 class="modal-title" id="terms-title">Deal terms</h2>
+
+    <div class="terms-grp">
+      <h4>Timing</h4>
+      <ul>
+        <li>Q4 2026 / October 2026 — BETA launch, no premium</li>
+        <li>Google = exclusive Tech partner for the 4Q26 launch / test</li>
+        <li>2027 &amp; beyond: 25% premium on Live Contextual inventory</li>
+        <li>First right of refusal for contextual position — lock by 12/1/26 (NBA only)</li>
+        <li>NFL extends to 1Q27, no premium</li>
+        <li>MLB = 2027 opportunity</li>
+      </ul>
+    </div>
+
+    <div class="terms-grp">
+      <h4>Minimum streaming investment (to unlock)</h4>
+      <ul>
+        <li><span class="lbl">SNF</span> $6.5M NET</li>
+        <li class="hi"><span class="lbl">CFB</span> $1M NET — this pilot</li>
+        <li><span class="lbl">NBA</span> $6M NET</li>
+        <li><span class="lbl">MLB</span> $2.5M NET (2027)</li>
+      </ul>
+    </div>
+
+    <div class="terms-grp">
+      <h4>Minimum linear investment (to unlock)</h4>
+      <ul>
+        <li><span class="lbl">SNF</span> flat to YAG</li>
+        <li class="hi"><span class="lbl">CFB</span> $3M gross — this pilot</li>
+        <li><span class="lbl">NBA</span> $14M gross</li>
+        <li><span class="lbl">MLB</span> $2.5M gross (2027)</li>
+      </ul>
+    </div>
+
+    <div class="terms-grp">
+      <h4>Flighting (BETA)</h4>
+      <ul>
+        <li><span class="lbl">NFL</span> 4Q–1Q</li>
+        <li class="hi"><span class="lbl">CFB</span> 4Q</li>
+        <li><span class="lbl">NBA</span> 4Q</li>
+        <li><span class="lbl">MLB</span> 1Q–3Q (2027)</li>
+      </ul>
+    </div>
+
+    <div class="terms-grp">
+      <h4>Live contextual moments (pick one per property)</h4>
+      <ul>
+        <li><span class="lbl">NFL</span> TDs OR INTs / Fumbles</li>
+        <li class="hi"><span class="lbl">CFB</span> TDs OR INTs / Fumbles — this pilot focuses here</li>
+        <li><span class="lbl">NBA</span> Clutch Moments OR Dunks</li>
+        <li><span class="lbl">MLB</span> HRs / Stolen Bases / 7th Inning Stretch (2027)</li>
+      </ul>
+    </div>
+
+    <div class="terms-grp">
+      <h4>Measurement requirement</h4>
+      <ul>
+        <li>10M impressions per cell</li>
+        <li><span class="lbl">Test cell</span> Live Contextual Alignment</li>
+        <li><span class="lbl">Comparison</span> Standard Ads within same sport</li>
+        <li>Goal: prove incremental impact of Live Contextual</li>
+      </ul>
+    </div>
+
+    <div class="terms-grp">
+      <h4>Asset delivery</h4>
+      <ul>
+        <li>5 business days prior to launch</li>
+        <li>Standard trafficking format</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────── HOW IT'S MADE MODAL ───────── -->
+<div class="modal" id="modal-made" role="dialog" aria-modal="true" aria-labelledby="made-title">
+  <div class="modal-body">
+    <button class="modal-close" data-close>×</button>
+    <div class="modal-kick">Production stack · May 2026</div>
+    <h2 class="modal-title" id="made-title">Made with the real Gemini API</h2>
+
+    <dl class="made-row">
+      <dt>Model</dt><dd>Nano Banana Pro — <code>gemini-3-pro-image-preview</code></dd>
+      <dt>Inputs</dt><dd>Meme template + friend face + team jersey + stadium (up to 14 reference images per render)</dd>
+      <dt>Render time</dt><dd>&lt; 10 seconds per image</dd>
+      <dt>Cost at scale</dt><dd>~$0.13 per image · pennies per impression at production volume</dd>
+      <dt>Text rendering</dt><dd>Native — handles meme captions (Doge, "this is fine," etc.) without OCR or compositing tricks</dd>
+      <dt>Workflow</dt><dd>Iterate on Nano Banana 2 (faster, cheaper) → final render on Nano Banana Pro</dd>
+    </dl>
+
+    <div class="made-foot">
+      This is not a mockup of fake tech. The same model and the same pipeline ships in production. Docs: <a href="https://ai.google.dev/gemini-api/docs/image-generation" target="_blank" rel="noopener">ai.google.dev/gemini-api</a>.
+    </div>
+  </div>
+</div>
+
+<script>
+  // ────────────────────────────────────────────────────────
+  // DATA
+  // ────────────────────────────────────────────────────────
+  const MOMENTS = [
+    { id:'fumble',      name:'Fumble Recovery',   desc:'Loose ball, change of possession. Highest volume trigger of the CFB season.' },
+    { id:'pick-six',    name:'Pick-Six',          desc:'Interception returned for a touchdown. Six-point swing in seven seconds.' },
+    { id:'interception',name:'Interception',      desc:'Defender catches the pass. Drive ends, possession flips.' },
+    { id:'strip-sack',  name:'Strip Sack',        desc:'QB hit, ball out, defense recovers. Field position + scoring threat.' },
+    { id:'punt-td',     name:'Punt Return TD',    desc:'Special-teams swing. Maximum highlight-reel energy.' },
+    { id:'kick-td',     name:'Kickoff Return TD', desc:'Opening-snap chaos. Resets every assumption about the game.' },
+    { id:'block-punt',  name:'Blocked Punt TD',   desc:'Eleven seconds of pandemonium. Rare, loud, broadcast-defining.' },
+    { id:'turnover-dn', name:'Turnover on Downs', desc:'4th-down stop in opponent territory. Momentum, scoring chance.' },
+  ];
+
+  const MEMES = [
+    { id:'this-is-fine',   name:'This Is Fine',          vibe:'Cartoon dog. Room on fire. Coping.' },
+    { id:'disaster-girl',  name:'Disaster Girl',         vibe:'Smirking kid. House burning. Iconic.' },
+    { id:'side-eye-chloe', name:'Side-Eye Chloe',        vibe:'Skeptical squint. Universal applicability.' },
+    { id:'success-kid',    name:'Success Kid',           vibe:'Fist-pumping toddler. Victory in sand form.' },
+    { id:'harold',         name:'Hide the Pain Harold',  vibe:'Smiling through agony. Eyes betray everything.' },
+    { id:'doge',           name:'Doge',                  vibe:'Such wow. Very Comic Sans. Much football.' },
+  ];
+
+  // narrative copy per combo — shown in the placeholder while Gemini renders
+  const COMBO_COPY = {
+    'fumble|disaster-girl':   'Your face as the smirking girl. Tennessee orange. Bryant-Denny burning in the background.',
+    'fumble|this-is-fine':    'Your face on the cartoon dog. Crimson living room on fire. "This is fine" in script.',
+    'fumble|side-eye-chloe':  'Your face as the skeptic. Orange Vols jersey. Side-eye toward the Alabama logo.',
+    'fumble|success-kid':     'Your face on the toddler. Tennessee orange. Sand swapped for Bryant-Denny grass.',
+    'fumble|harold':          'Your face smiling through it. Crimson sweater. Eyes that have seen the box score.',
+    'fumble|doge':            '"such fumble. very Tennessee. wow." Comic Sans. Orange tint. Doge eyes.',
+    'pick-six|disaster-girl': 'Same smirk, fresh disaster. Orange checkerboard endzone behind you.',
+    'pick-six|this-is-fine':  'Crimson room. Scoreboard visible through the flames, showing the six-point swing.',
+    'pick-six|side-eye-chloe':'The squint reserved for fourth-quarter defensive collapses.',
+    'pick-six|success-kid':   'Tiny fist. Big stadium. You, victorious, on the Tennessee sideline.',
+    'pick-six|harold':        'Smiling. Definitely smiling. Crimson hoodie. Eyes elsewhere.',
+    'pick-six|doge':          '"such pick. very six. wow." Doge in orange, watching the return.',
+  };
+
+  const DEFAULT_CAPTION = 'Made in 8 seconds. During the next turnover.';
+
+  // ────────────────────────────────────────────────────────
+  // STATE
+  // ────────────────────────────────────────────────────────
+  let pickedMoment = null;
+  let pickedMeme   = null;
+  let renderTimer  = null;
+
+  // ────────────────────────────────────────────────────────
+  // RENDER GRIDS
+  // ────────────────────────────────────────────────────────
+  const momentsGrid = document.getElementById('moments-grid');
+  const memesGrid   = document.getElementById('memes-grid');
+
+  MOMENTS.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.kind = 'moment';
+    el.dataset.id   = m.id;
+    el.innerHTML = `
+      <div class="c-icon">${(m.name.match(/\b[A-Z]/g) || []).slice(0,2).join('') || '·'}</div>
+      <div class="c-name">${m.name}</div>
+      <div class="c-desc">${m.desc}</div>
+      <div class="c-tag">Ad break · ~90s</div>
+    `;
+    el.addEventListener('click', () => selectMoment(m.id));
+    momentsGrid.appendChild(el);
+  });
+
+  MEMES.forEach(mm => {
+    const el = document.createElement('div');
+    el.className = 'card meme-card';
+    el.dataset.kind = 'meme';
+    el.dataset.id   = mm.id;
+    el.innerHTML = `
+      <div class="meme-thumb">
+        <img src="/images/memes/${mm.id}.jpg" alt="${mm.name}" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
+        <div class="meme-ph" style="display:none">${mm.name.split(' ').map(w=>w[0]).join('')}</div>
+      </div>
+      <div class="c-name">${mm.name}</div>
+      <div class="c-desc">${mm.vibe}</div>
+    `;
+    el.addEventListener('click', () => selectMeme(mm.id));
+    memesGrid.appendChild(el);
+  });
+
+  // ────────────────────────────────────────────────────────
+  // SELECTION HANDLERS
+  // ────────────────────────────────────────────────────────
+  function selectMoment(id) {
+    pickedMoment = id;
+    document.querySelectorAll('.card[data-kind="moment"]').forEach(c =>
+      c.classList.toggle('active', c.dataset.id === id));
+    const m = MOMENTS.find(x => x.id === id);
+    updateFormula('moment', m.name);
+    maybeRevealOrPrompt();
+    if (!pickedMeme) {
+      document.getElementById('step-2').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  }
+
+  function selectMeme(id) {
+    pickedMeme = id;
+    document.querySelectorAll('.card[data-kind="meme"]').forEach(c =>
+      c.classList.toggle('active', c.dataset.id === id));
+    const mm = MEMES.find(x => x.id === id);
+    updateFormula('meme', mm.name);
+    maybeRevealOrPrompt();
+    if (!pickedMoment) {
+      document.getElementById('step-1').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  }
+
+  function updateFormula(which, label) {
+    document.querySelector(`#hero-formula .f-slot[data-slot="${which}"]`)
+      .classList.add('filled');
+    document.querySelector(`#hero-formula .f-slot[data-slot="${which}"]`)
+      .textContent = label.toUpperCase();
+    const stick = document.querySelector(`.pill[data-stick="${which}"]`);
+    stick.classList.add('filled');
+    stick.textContent = label;
+  }
+
+  function maybeRevealOrPrompt() {
+    if (pickedMoment && pickedMeme) {
+      triggerReveal();
+    }
+  }
+
+  // ────────────────────────────────────────────────────────
+  // REVEAL
+  // ────────────────────────────────────────────────────────
+  function triggerReveal() {
+    const reveal = document.getElementById('reveal');
+    const key    = `${pickedMoment}|${pickedMeme}`;
+    const moment = MOMENTS.find(x => x.id === pickedMoment);
+    const meme   = MEMES.find(x => x.id === pickedMeme);
+    const copy   = COMBO_COPY[key] || `You, as ${meme.name}, in the moment after the ${moment.name.toLowerCase()}.`;
+    const caption = DEFAULT_CAPTION;
+
+    reveal.innerHTML = `
+      <div class="ctv-frame" id="ctv-frame">
+        <img class="ad-img" id="ad-img"
+             alt="${moment.name} × ${meme.name}"
+             style="display:none">
+        <div class="ad-placeholder" id="ad-ph">
+          <div class="ph-kick">Beckett · awaiting Gemini render</div>
+          <div class="ph-formula">${moment.name}<br>× ${meme.name}</div>
+          <div class="ph-friend">
+            <div class="friend-av lg">
+              <img src="/images/friend.jpg" alt="Friend" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
+              <div class="fa-ph" style="display:none">YOU</div>
+            </div>
+          </div>
+          <div class="ph-desc">${copy}</div>
+          <div class="ph-note">model: gemini-3-pro-image-preview · key: GEMINI_KEY</div>
+        </div>
+        <div class="render-overlay on" id="render-ov">
+          <div class="spinner"></div>
+          <div class="render-msg"><span class="gem">Gemini</span> · rendering your ad…</div>
+        </div>
+      </div>
+      <div class="ctv-stand"></div>
+      <div class="ctv-stand-base"></div>
+      <div class="reveal-meta">
+        <div class="caption" id="ad-caption"><span class="em">${moment.name} × ${meme.name}.</span> ${caption}</div>
+        <div class="gem-lockup"><span class="dot"></span> Powered by Gemini · Nano Banana Pro</div>
+      </div>
+      <div class="reveal-actions">
+        <button class="cta-primary" id="again-btn">Try another combination →</button>
+        <button class="cta-ghost" data-open="made">How it's made →</button>
+      </div>
+    `;
+
+    document.getElementById('again-btn').addEventListener('click', resetAll);
+    bindModalOpens();
+
+    // scroll the reveal into view
+    setTimeout(() => {
+      document.getElementById('step-3').scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 250);
+
+    // fire live Gemini render
+    clearTimeout(renderTimer);
+    const myKey = key;
+    fetch(`/api/render?moment=${pickedMoment}&meme=${pickedMeme}`)
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('render failed: ' + r.status)))
+      .then(data => {
+        // ignore if user moved on to a different combo
+        if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
+        if (!data.image) throw new Error('no image returned');
+        const img = document.getElementById('ad-img');
+        img.src = data.image; // data: URL from API
+        img.style.display = 'block';
+        document.getElementById('ad-ph').style.display = 'none';
+        document.getElementById('render-ov').classList.remove('on');
+      })
+      .catch(err => {
+        if (`${pickedMoment}|${pickedMeme}` !== myKey) return;
+        // keep the styled placeholder; drop the overlay and annotate caption
+        console.error('[beckett] render error:', err);
+        document.getElementById('render-ov').classList.remove('on');
+        const cap = document.getElementById('ad-caption');
+        if (cap) cap.innerHTML += ' <span style="color:var(--mute)">· live render unavailable</span>';
+      });
+  }
+
+  function resetAll() {
+    pickedMoment = null;
+    pickedMeme   = null;
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    ['moment','meme'].forEach(k => {
+      const h = document.querySelector(`#hero-formula .f-slot[data-slot="${k}"]`);
+      h.classList.remove('filled');
+      h.textContent = k.toUpperCase();
+      const s = document.querySelector(`.pill[data-stick="${k}"]`);
+      s.classList.remove('filled');
+      s.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+    });
+    document.getElementById('reveal').innerHTML = `
+      <div class="reveal-empty">
+        <div class="e-kick">Awaiting input</div>
+        <div class="e-msg">Pick a moment + meme above</div>
+      </div>`;
+    document.getElementById('step-1').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+  document.getElementById('reset-btn').addEventListener('click', resetAll);
+
+  // ────────────────────────────────────────────────────────
+  // MODALS
+  // ────────────────────────────────────────────────────────
+  function bindModalOpens() {
+    document.querySelectorAll('[data-open]').forEach(btn => {
+      if (btn._bound) return;
+      btn._bound = true;
+      btn.addEventListener('click', () => {
+        const m = document.getElementById('modal-' + btn.dataset.open);
+        if (m) { m.classList.add('on'); document.body.style.overflow = 'hidden'; }
+      });
+    });
+  }
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeModals());
+  });
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) closeModals(); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModals();
+  });
+  function closeModals() {
+    document.querySelectorAll('.modal').forEach(m => m.classList.remove('on'));
+    document.body.style.overflow = '';
+  }
+  bindModalOpens();
+</script>
+</body>
+</html>
