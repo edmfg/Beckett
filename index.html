@@ -86,6 +86,22 @@
   /* keep hero content above the bg/scrim/pulse layers (exclude the bg layers themselves) */
   .hero > *:not(.video-bg):not(.video-scrim){position:relative;z-index:4}
 
+  /* meme template overlay on the render frame — shows meme being used as inspiration */
+  .render-template{position:absolute;left:5%;top:24%;width:22%;z-index:2;
+    display:flex;flex-direction:column;gap:8px;align-items:center}
+  .render-template-kick{font-family:var(--cond);font-weight:700;font-size:clamp(9px,1.1vw,12px);
+    letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
+    background:rgba(0,0,0,.78);padding:5px 10px;border:1px solid var(--accent)}
+  .render-template img{width:100%;aspect-ratio:1/1;object-fit:cover;
+    border:3px solid #fff;box-shadow:0 6px 28px rgba(0,0,0,.7)}
+  .render-template-name{font-family:var(--cond);font-weight:600;font-size:clamp(11px,1.3vw,14px);
+    letter-spacing:.16em;text-transform:uppercase;color:#fff;text-align:center;
+    text-shadow:0 2px 6px rgba(0,0,0,.9)}
+  .render-template-arrow{position:absolute;left:28%;top:42%;z-index:2;
+    font-family:var(--display);font-size:clamp(22px,3vw,34px);color:var(--accent);
+    text-shadow:0 2px 8px rgba(0,0,0,.8)}
+  @media(max-width:700px){.render-template{width:30%;left:3%;top:18%}.render-template-arrow{display:none}}
+
   /* LIVE word pulse — subtle red glow oscillation on the headline */
   .live-pulse{animation:live-glow 2.8s ease-in-out infinite;will-change:text-shadow}
   @keyframes live-glow{
@@ -205,9 +221,14 @@
   .wp-kick{font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.3em;
     text-transform:uppercase;color:var(--accent)}
   .wp-quote{font-family:var(--display);font-size:clamp(22px,3vw,38px);
-    letter-spacing:.02em;text-transform:uppercase;line-height:1.05;color:var(--ink)}
-  .wp-quote::before{content:open-quote;margin-right:4px;color:var(--mute)}
-  .wp-quote::after{content:close-quote;margin-left:4px;color:var(--mute)}
+    letter-spacing:.02em;text-transform:uppercase;line-height:1.05;
+    background:linear-gradient(90deg,var(--gem-a) 0%,var(--gem-b) 50%,var(--gem-c) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-fill-color:transparent}
+  .wp-quote::before{content:open-quote;margin-right:4px;color:var(--mute);
+    -webkit-text-fill-color:var(--mute);background:none}
+  .wp-quote::after{content:close-quote;margin-left:4px;color:var(--mute);
+    -webkit-text-fill-color:var(--mute);background:none}
 
   .why-foot{font-family:var(--body);font-size:15px;color:var(--chalk);line-height:1.6;
     margin-top:22px;max-width:780px}
@@ -955,6 +976,12 @@
     const f2 = `
       <div class="frame-stage" data-fi="2">
         <img src="/images/frames/render.jpg" alt="Phone showing Gemini AI rendering">
+        <div class="render-template">
+          <div class="render-template-kick">Template</div>
+          <img src="/images/memes/${meme.id}.jpg" alt="${meme.name} template">
+          <div class="render-template-name">${meme.name}</div>
+        </div>
+        <div class="render-template-arrow">→</div>
         <div class="frame-cap"><b>GEMINI</b> Memifying with ${meme.name}…</div>
       </div>`;
 
