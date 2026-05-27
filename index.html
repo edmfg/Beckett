@@ -163,6 +163,14 @@
 
   .c-icon{font-family:var(--display);font-size:42px;color:var(--accent);
     line-height:1;letter-spacing:.02em}
+  .moment-thumb{aspect-ratio:16/10;background:#0a0a0d;overflow:hidden;
+    margin:-22px -22px 0;border-bottom:1px solid var(--line);position:relative}
+  .moment-thumb img{width:100%;height:100%;object-fit:cover;display:block;
+    transition:transform .4s ease}
+  .card:hover .moment-thumb img{transform:scale(1.04)}
+  .moment-thumb::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 60%,rgba(13,13,15,.6) 100%);
+    pointer-events:none}
   .c-name{font-family:var(--display);font-size:22px;letter-spacing:.02em;
     text-transform:uppercase;line-height:1}
   .c-desc{font-family:var(--body);font-size:13px;color:var(--mute);line-height:1.4;
@@ -654,7 +662,10 @@
     el.dataset.kind = 'moment';
     el.dataset.id   = m.id;
     el.innerHTML = `
-      <div class="c-icon">${(m.name.match(/\b[A-Z]/g) || []).slice(0,2).join('') || '·'}</div>
+      <div class="moment-thumb">
+        <img src="/images/moments/${m.id}.jpg" alt="${m.name}" loading="lazy"
+             onerror="this.style.display='none'">
+      </div>
       <div class="c-name">${m.name}</div>
       <div class="c-desc">${m.desc}</div>
       <div class="c-tag">Ad break · ~90s</div>
