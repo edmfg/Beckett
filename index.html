@@ -1085,15 +1085,6 @@
 
     reveal.innerHTML = `
       <div class="reveal-stage">
-        <div class="ref-panel">
-          <div class="ref-label">Original</div>
-          <div class="ref-photo">
-            <img src="/images/friend.jpg" alt="Reference photo" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
-            <div class="rp-ph" style="display:none">REFERENCE</div>
-          </div>
-          <div class="ref-caption">Source photo passed to Gemini as the friend reference</div>
-        </div>
-        <div class="ref-arrow">→</div>
         <div class="ctv-wrap">
           <div class="ctv-frame" id="ctv-frame">
             ${buildFrames(moment, meme)}
