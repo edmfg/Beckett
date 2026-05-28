@@ -54,11 +54,24 @@
   .wordmark .gem{
     background:linear-gradient(90deg,var(--gem-a),var(--gem-b) 55%,var(--gem-c));
     -webkit-background-clip:text;background-clip:text;color:transparent}
+  .topbar-btns{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
   .deal-btn{font-family:var(--cond);font-weight:600;font-size:13px;
     letter-spacing:.22em;text-transform:uppercase;color:var(--ink);
     border:1.5px solid var(--line);padding:11px 18px;
     transition:border-color .2s,background .2s}
   .deal-btn:hover{border-color:var(--accent);background:rgba(255,45,45,.06)}
+  .dibs-btn{font-family:var(--cond);font-weight:700;font-size:11px;
+    letter-spacing:.28em;text-transform:uppercase;color:var(--accent);
+    border:1.5px solid var(--accent);padding:8px 14px;
+    transition:background .2s,color .2s;cursor:pointer}
+  .dibs-btn:hover{background:var(--accent);color:#fff}
+  .modal-pdf-body{background:#111113;border:1px solid var(--line);
+    max-width:min(96vw,1200px);width:100%;padding:0;position:relative;
+    display:flex;flex-direction:column}
+  .modal-pdf-header{padding:18px 22px 14px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .modal-pdf-header .modal-kick{margin-bottom:0}
+  .modal-pdf-iframe{width:100%;height:82vh;border:0;display:block;flex:1}
 
   /* ───────── hero — tunnel ───────── */
   .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
@@ -630,7 +643,10 @@
     <img class="brand-logo" src="/assets/nbcsn-cfb-logo.png" alt="NBC Sports Network College Football">
     <div class="wordmark">Live Contextual</div>
   </div>
-  <button class="deal-btn" data-open="terms">See the deal terms →</button>
+  <div class="topbar-btns">
+    <button class="deal-btn" data-open="terms">See the deal terms →</button>
+    <button class="dibs-btn" data-open="dibs">1st Dibs Moments →</button>
+  </div>
 </header>
 
 <!-- ───────── HERO ───────── -->
@@ -727,6 +743,20 @@
   <div class="fl"><b class="beckett-mark tip-left" data-tip="Named for Sam Beckett — NBC's Quantum Leap protagonist who leaps directly into other people's most interesting moments. Beckett puts you in the ad the same way.">BECKETT</b> — leap into the ad · Gemini × NBCU Live Contextual</div>
   <div class="fl">WPP · GroupM · Google · NBCU</div>
 </footer>
+
+<!-- ───────── 1ST DIBS MOMENTS MODAL ───────── -->
+<div class="modal" id="modal-dibs" role="dialog" aria-modal="true" aria-labelledby="dibs-title">
+  <div class="modal-pdf-body">
+    <div class="modal-pdf-header">
+      <div>
+        <div class="modal-kick">NBCU Pilot · 2026–27</div>
+        <h2 class="modal-title" id="dibs-title" style="font-size:clamp(22px,2.5vw,34px);margin-bottom:0">1st Dibs Moments</h2>
+      </div>
+      <button class="modal-close" data-close style="position:static;flex-shrink:0">×</button>
+    </div>
+    <iframe class="modal-pdf-iframe" src="/assets/first-dibs-moments.pdf" title="2026 First Dibs Contextual Decklette"></iframe>
+  </div>
+</div>
 
 <!-- ───────── DEAL TERMS MODAL ───────── -->
 <div class="modal" id="modal-terms" role="dialog" aria-modal="true" aria-labelledby="terms-title">
