@@ -134,6 +134,12 @@
   /* touch devices (set in JS) — kill per-frame hero repaints even in iOS
      desktop-site mode, where the max-width:700px query won't match */
   .lite-fx .hero::after,.lite-fx .live-pulse{animation:none !important}
+  /* hero scrolled out of view (set in JS) — Chrome keeps CSS animations
+     running on off-screen elements, so the text-shadow keyframes on the huge
+     headline kept repainting every frame while the user was down at the
+     Moments/Memes grids. That per-frame repaint is what made clicking the
+     cards feel laggy and the page feel broken. Freeze them while resting. */
+  .hero-rest .hero::after,.hero-rest .live-pulse{animation:none !important}
 
   /* ───────── mobile pass ───────── */
   /* on mobile the live IFrame video is skipped (see heroVideoAllowed) — the poster image is the hero bg */
@@ -1471,6 +1477,22 @@
   // Mirror the decision onto <html> so the expensive hero animations are also
   // dropped on touch devices regardless of the (possibly spoofed) viewport width.
   if (!heroVideoAllowed()) document.documentElement.classList.add('lite-fx');
+
+  // Freeze the per-frame hero animations (text-shadow pulse + breathe) whenever
+  // the hero scrolls out of view. Chrome keeps CSS animations ticking on
+  // off-screen elements, so without this the giant headline keeps repainting
+  // every frame while the user is down at the Moments/Memes grids — which is
+  // what made clicking the cards feel laggy. Runs on every device; on touch
+  // lite-fx already kills them, so this is the desktop win. The hero starts in
+  // view, so animations play normally at the top and only rest once you scroll.
+  (function restHeroWhenOffscreen(){
+    const heroEl = document.querySelector('.hero');
+    if (!heroEl || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(entries => {
+      entries.forEach(en =>
+        document.documentElement.classList.toggle('hero-rest', !en.isIntersecting));
+    }, { threshold: 0 }).observe(heroEl);
+  })();
   (function loadYTAPI(){
     if (!heroVideoAllowed()) return;   // poster image stays as the hero background
     if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
