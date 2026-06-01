@@ -133,7 +133,7 @@
   }
 
   /* ───────── mobile pass ───────── */
-  /* video stays on mobile (short looped clip via IFrame API) — poster image is the fallback */
+  /* on mobile the live IFrame video is skipped (see heroVideoAllowed) — the poster image is the hero bg */
   @media (max-width:700px){
     /* shrink the CTV bezel border so the TV isn't a postage stamp */
     .ctv-frame{border-width:6px}
@@ -1445,7 +1445,19 @@
       }, { threshold: 0.15 }).observe(heroEl);
     }
   };
+  // Only run the live YouTube background where it won't hurt: a full-screen
+  // iframe decoding continuously pins the main thread, and on phones that made
+  // the page feel unscrollable and the steps untappable. On small/touch screens
+  // (and for reduced-motion users) we skip the iframe entirely and let the CSS
+  // poster image stand in as the hero background.
+  function heroVideoAllowed(){
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const smallOrTouch = window.matchMedia('(max-width:700px)').matches
+                      || window.matchMedia('(hover:none) and (pointer:coarse)').matches;
+    return !reduce && !smallOrTouch;
+  }
   (function loadYTAPI(){
+    if (!heroVideoAllowed()) return;   // poster image stays as the hero background
     if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
     const s = document.createElement('script');
     s.src = 'https://www.youtube.com/iframe_api';
