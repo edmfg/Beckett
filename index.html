@@ -143,6 +143,11 @@
     .modal{padding:0;align-items:stretch}
     .modal-body{max-width:100%;min-height:100%;padding:30px 22px}
     .modal-close{top:10px;right:10px}
+    /* drop continuously-repainting decorative animations on phones — the
+       text-shadow keyframes in particular force a CPU repaint of the huge
+       hero headline every frame, which fights touch scrolling */
+    .hero::after{animation:none}
+    .live-pulse{animation:none}
   }
   .h-kick{font-family:var(--cond);font-size:clamp(14px,1.6vw,18px);font-weight:600;
     letter-spacing:.3em;text-transform:uppercase;color:var(--accent);
