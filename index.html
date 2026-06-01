@@ -1408,7 +1408,7 @@
   bindModalOpens();
 
   // YouTube IFrame Player API — tight looped clip (start..end seek-back)
-  let heroPlayer;
+  let heroPlayer, heroReady = false, heroVisible = true;
   window.onYouTubeIframeAPIReady = function() {
     heroPlayer = new YT.Player('hero-player', {
       videoId: 'ij8JB47XbZA',
@@ -1419,7 +1419,7 @@
         start: 170, end: 182
       },
       events: {
-        onReady: e => { e.target.mute(); e.target.playVideo(); },
+        onReady: e => { e.target.mute(); heroReady = true; if (heroVisible) e.target.playVideo(); },
         onStateChange: e => {
           if (e.data === YT.PlayerState.ENDED) {
             heroPlayer.seekTo(170, true);
@@ -1428,6 +1428,22 @@
         }
       }
     });
+
+    // Pause the (heavy) hero video whenever it scrolls out of view. A full-screen
+    // YouTube iframe decoding continuously keeps the main thread busy, which on
+    // mobile makes the steps below feel unclickable and scrolling janky. Pausing
+    // it once the hero leaves the viewport frees the thread; we resume on return.
+    const heroEl = document.querySelector('.hero');
+    if (heroEl && 'IntersectionObserver' in window) {
+      new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          heroVisible = en.isIntersecting;
+          if (!heroReady || !heroPlayer) return;
+          if (heroVisible) heroPlayer.playVideo();
+          else heroPlayer.pauseVideo();
+        });
+      }, { threshold: 0.15 }).observe(heroEl);
+    }
   };
   (function loadYTAPI(){
     if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
