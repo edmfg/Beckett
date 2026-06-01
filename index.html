@@ -131,6 +131,9 @@
     .hero::after,.live-pulse{animation:none !important}
     .video-bg{display:none}
   }
+  /* touch devices (set in JS) — kill per-frame hero repaints even in iOS
+     desktop-site mode, where the max-width:700px query won't match */
+  .lite-fx .hero::after,.lite-fx .live-pulse{animation:none !important}
 
   /* ───────── mobile pass ───────── */
   /* on mobile the live IFrame video is skipped (see heroVideoAllowed) — the poster image is the hero bg */
@@ -1457,10 +1460,17 @@
   // poster image stand in as the hero background.
   function heroVideoAllowed(){
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const smallOrTouch = window.matchMedia('(max-width:700px)').matches
-                      || window.matchMedia('(hover:none) and (pointer:coarse)').matches;
+    // Detect real touch hardware even when iOS "Request Desktop Website" spoofs a
+    // desktop UA + wide viewport — that spoof defeats width- and pointer-based
+    // checks, so maxTouchPoints (a hardware fact) is the reliable signal.
+    const touch = (navigator.maxTouchPoints || 0) > 0
+               || window.matchMedia('(any-pointer:coarse)').matches;
+    const smallOrTouch = window.matchMedia('(max-width:700px)').matches || touch;
     return !reduce && !smallOrTouch;
   }
+  // Mirror the decision onto <html> so the expensive hero animations are also
+  // dropped on touch devices regardless of the (possibly spoofed) viewport width.
+  if (!heroVideoAllowed()) document.documentElement.classList.add('lite-fx');
   (function loadYTAPI(){
     if (!heroVideoAllowed()) return;   // poster image stays as the hero background
     if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
