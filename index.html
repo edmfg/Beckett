@@ -300,6 +300,10 @@
 
   /* ───────── sections ───────── */
   section{padding:9vh 6vw;position:relative}
+  /* Skip rendering off-screen sections while scrolling (big win on this tall
+     page). contain-intrinsic-size:auto remembers each section's real height
+     after first render, so the scrollbar stays stable — no jump. */
+  .why-panel,#step-1,#step-2{content-visibility:auto;contain-intrinsic-size:auto 800px}
   .s-head{display:flex;align-items:baseline;gap:24px;margin-bottom:8px;flex-wrap:wrap}
   .s-num{font-family:var(--display);font-size:clamp(48px,7vw,100px);
     line-height:.9;color:var(--accent);letter-spacing:.02em}
@@ -958,7 +962,7 @@
     el.dataset.id   = m.id;
     el.innerHTML = `
       <div class="moment-thumb">
-        <img src="/images/moments/${m.id}.jpg" alt="${m.name}" loading="lazy"
+        <img src="/images/moments/${m.id}.jpg" alt="${m.name}" loading="lazy" decoding="async"
              onerror="this.style.display='none'">
       </div>
       <div class="c-name">${m.name}</div>
@@ -976,7 +980,7 @@
     el.dataset.id   = mm.id;
     el.innerHTML = `
       <div class="meme-thumb">
-        <img src="/images/memes/${mm.id}.jpg" alt="${mm.name}" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
+        <img src="/images/memes/${mm.id}.jpg" alt="${mm.name}" loading="lazy" decoding="async" onerror="this.classList.add('failed');this.nextElementSibling.style.display='flex'">
         <div class="meme-ph" style="display:none">${mm.name.split(' ').map(w=>w[0]).join('')}</div>
       </div>
       <div class="c-name">${mm.name}</div>
@@ -1456,15 +1460,11 @@
     // Honor reduced-motion: leave the poster image showing, don't play.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     v.muted = true; // required for autoplay
-    const play = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
-    play();
-    // Pause while scrolled out of view to save power; resume on return.
-    const heroEl = document.querySelector('.hero');
-    if (heroEl && 'IntersectionObserver' in window) {
-      new IntersectionObserver(entries => {
-        entries.forEach(en => { if (en.isIntersecting) play(); else v.pause(); });
-      }, { threshold: 0.15 }).observe(heroEl);
-    }
+    const p = v.play(); if (p && p.catch) p.catch(() => {});
+    // NOTE: deliberately NOT pausing/playing on scroll. Toggling play()/pause()
+    // as the hero crossed the viewport edge spiked the decoder and froze the
+    // page mid-scroll. The clip is small/low-res, so just letting it loop
+    // continuously is cheaper than the decode restarts.
   })();
 
   // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
