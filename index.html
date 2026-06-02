@@ -391,10 +391,12 @@
 
   /* step 3 subtle room backdrop — makes the CTV bezel read as mounted in a real room */
   #step-3{position:relative;overflow:hidden;isolation:isolate}
+  /* dimmed static room backdrop — the heavy blur(24px) filter was dropped
+     because re-compositing it on scroll caused jank on some devices */
   #step-3::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
     background:url(/images/frames/couch.jpg) center 30%/cover no-repeat;
-    filter:blur(24px) brightness(.32) saturate(1.15);
-    opacity:.55;transform:scale(1.08)}
+    filter:brightness(.2) saturate(1.1);
+    opacity:.4}
   #step-3::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
     background:radial-gradient(ellipse 80% 60% at 50% 50%,transparent 30%,rgba(13,13,15,.7) 90%)}
 
@@ -982,6 +984,22 @@
   // ────────────────────────────────────────────────────────
   // SELECTION HANDLERS
   // ────────────────────────────────────────────────────────
+  // Crisp, immediate jump to a step. The page sets html{scroll-behavior:smooth},
+  // which turns programmatic scrolls into a slow ~2000px drift that stutters on
+  // slower devices — so picking a moment felt like nothing happened. Force an
+  // instant jump for the step-to-step auto-advance (temporarily overriding the
+  // CSS), then restore smooth for everything else.
+  function jumpToStep(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const root = document.documentElement;
+    const prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    el.scrollIntoView({ block: 'start' });
+    // restore on the next frame so later scrolls (e.g. the reveal) stay smooth
+    requestAnimationFrame(() => { root.style.scrollBehavior = prev; });
+  }
+
   function selectMoment(id) {
     pickedMoment = id;
     document.querySelectorAll('.card[data-kind="moment"]').forEach(c =>
@@ -990,7 +1008,7 @@
     updateFormula('moment', m.name);
     maybeRevealOrPrompt();
     if (!pickedMeme) {
-      document.getElementById('step-2').scrollIntoView({ behavior:'smooth', block:'start' });
+      jumpToStep('step-2');
     }
   }
 
@@ -1002,7 +1020,7 @@
     updateFormula('meme', mm.name);
     maybeRevealOrPrompt();
     if (!pickedMoment) {
-      document.getElementById('step-1').scrollIntoView({ behavior:'smooth', block:'start' });
+      jumpToStep('step-1');
     }
   }
 
@@ -1459,23 +1477,15 @@
       }, { threshold: 0.15 }).observe(heroEl);
     }
   };
-  // Only run the live YouTube background where it won't hurt: a full-screen
-  // iframe decoding continuously pins the main thread, and on phones that made
-  // the page feel unscrollable and the steps untappable. On small/touch screens
-  // (and for reduced-motion users) we skip the iframe entirely and let the CSS
-  // poster image stand in as the hero background.
+  // Hero video is disabled on ALL devices. A full-screen autoplaying YouTube
+  // iframe decodes continuously and was the main cause of scroll jank; the
+  // high-res poster image set on .video-bg is the hero background instead.
+  // Returning false here also turns on lite-fx below, which freezes the
+  // per-frame hero animations (text-shadow pulse + breathe glow).
   function heroVideoAllowed(){
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // Detect real touch hardware even when iOS "Request Desktop Website" spoofs a
-    // desktop UA + wide viewport — that spoof defeats width- and pointer-based
-    // checks, so maxTouchPoints (a hardware fact) is the reliable signal.
-    const touch = (navigator.maxTouchPoints || 0) > 0
-               || window.matchMedia('(any-pointer:coarse)').matches;
-    const smallOrTouch = window.matchMedia('(max-width:700px)').matches || touch;
-    return !reduce && !smallOrTouch;
+    return false;
   }
-  // Mirror the decision onto <html> so the expensive hero animations are also
-  // dropped on touch devices regardless of the (possibly spoofed) viewport width.
+  // lite-fx freezes the expensive per-frame hero animations on every device.
   if (!heroVideoAllowed()) document.documentElement.classList.add('lite-fx');
 
   // Freeze the per-frame hero animations (text-shadow pulse + breathe) whenever
