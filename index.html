@@ -82,11 +82,8 @@
   /* poster fallback so something always shows even if the iframe is blocked */
   .video-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
     background:url(https://i.ytimg.com/vi/ij8JB47XbZA/maxresdefault.jpg) center/cover no-repeat #000}
-  .video-bg iframe,.video-bg #hero-player{position:absolute;top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    width:max(100%,177.78vh);  /* 16:9 ratio against viewport height */
-    height:max(100%,56.25vw);  /* 9:16 ratio against viewport width */
-    border:0;pointer-events:none;background:transparent}
+  .video-bg video{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;border:0;pointer-events:none;background:transparent}
   /* scrim — keeps text legible over the live video */
   .video-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;
     background:
@@ -673,7 +670,10 @@
 <!-- ───────── HERO ───────── -->
 <div class="hero">
   <div class="video-bg" aria-hidden="true">
-    <div id="hero-player"></div>
+    <video id="hero-video" muted loop playsinline preload="auto"
+           poster="https://i.ytimg.com/vi/ij8JB47XbZA/maxresdefault.jpg">
+      <source src="/assets/hero-loop.mp4" type="video/mp4">
+    </video>
   </div>
   <div class="video-scrim" aria-hidden="true"></div>
   <div class="h-kick">Beckett · Q4 2026 · CFB Saturdays · BETA</div>
@@ -1442,101 +1442,27 @@
   }
   bindModalOpens();
 
-  // YouTube IFrame Player API — tight looped clip (start..end seek-back)
-  let heroPlayer, heroReady = false, heroVisible = true;
-  window.onYouTubeIframeAPIReady = function() {
-    heroPlayer = new YT.Player('hero-player', {
-      videoId: 'ij8JB47XbZA',
-      playerVars: {
-        autoplay: 1, mute: 1, controls: 0, modestbranding: 1,
-        playsinline: 1, rel: 0, showinfo: 0, iv_load_policy: 3,
-        disablekb: 1, fs: 0, cc_load_policy: 0,
-        start: 170, end: 182
-      },
-      events: {
-        onReady: e => { e.target.mute(); heroReady = true; if (heroVisible) e.target.playVideo(); },
-        onStateChange: e => {
-          if (e.data === YT.PlayerState.ENDED) {
-            heroPlayer.seekTo(170, true);
-            heroPlayer.playVideo();
-          }
-        }
-      }
-    });
-
-    // Guard play/pause so scrolling near the hero edge doesn't thrash the
-    // player (repeated play/pause calls each trigger a decode hitch).
-    var setHeroPlaying = function(want){
-      if (!heroReady || !heroPlayer || !heroPlayer.getPlayerState) return;
-      var playing = heroPlayer.getPlayerState() === YT.PlayerState.PLAYING;
-      if (want && !playing) heroPlayer.playVideo();
-      else if (!want && playing) heroPlayer.pauseVideo();
-    };
-
-    // Pause the (heavy) hero video whenever it scrolls out of view. A full-screen
-    // YouTube iframe decoding continuously keeps the main thread busy, which on
-    // mobile makes the steps below feel unclickable and scrolling janky. Pausing
-    // it once the hero leaves the viewport frees the thread; we resume on return.
+  // Hero background video — self-hosted, looped natively.
+  // Replaces the old YouTube iframe. A cross-origin iframe sitting over the hero
+  // could swallow trackpad/wheel scroll events (arrow keys still worked because
+  // they scroll the document, not the element under the cursor) and its
+  // buffering caused the load stalls. A native <video> has neither problem and
+  // loops seamlessly with far less main-thread cost.
+  (function heroVideo(){
+    const v = document.getElementById('hero-video');
+    if (!v) return;
+    // Honor reduced-motion: leave the poster image showing, don't play.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    v.muted = true; // required for autoplay
+    const play = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    play();
+    // Pause while scrolled out of view to save power; resume on return.
     const heroEl = document.querySelector('.hero');
     if (heroEl && 'IntersectionObserver' in window) {
       new IntersectionObserver(entries => {
-        entries.forEach(en => {
-          heroVisible = en.isIntersecting;
-          setHeroPlaying(heroVisible);
-        });
+        entries.forEach(en => { if (en.isIntersecting) play(); else v.pause(); });
       }, { threshold: 0.15 }).observe(heroEl);
     }
-  };
-  // Run the live YouTube hero background on capable (non-touch, motion-OK)
-  // screens. It pauses when scrolled offscreen (see IntersectionObserver above).
-  // On small/touch screens and for reduced-motion users we skip the iframe and
-  // let the poster image stand in as the hero background.
-  function heroVideoAllowed(){
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // maxTouchPoints is a hardware fact iOS "Request Desktop Website" can't spoof.
-    const touch = (navigator.maxTouchPoints || 0) > 0
-               || window.matchMedia('(any-pointer:coarse)').matches;
-    const smallOrTouch = window.matchMedia('(max-width:700px)').matches || touch;
-    return !reduce && !smallOrTouch;
-  }
-  // Where the video is skipped, also freeze the per-frame hero animations.
-  if (!heroVideoAllowed()) document.documentElement.classList.add('lite-fx');
-
-  // Freeze the per-frame hero animations (text-shadow pulse + breathe) whenever
-  // the hero scrolls out of view. Chrome keeps CSS animations ticking on
-  // off-screen elements, so without this the giant headline keeps repainting
-  // every frame while the user is down at the Moments/Memes grids — which is
-  // what made clicking the cards feel laggy. Runs on every device; on touch
-  // lite-fx already kills them, so this is the desktop win. The hero starts in
-  // view, so animations play normally at the top and only rest once you scroll.
-  (function restHeroWhenOffscreen(){
-    const heroEl = document.querySelector('.hero');
-    if (!heroEl || !('IntersectionObserver' in window)) return;
-    new IntersectionObserver(entries => {
-      entries.forEach(en =>
-        document.documentElement.classList.toggle('hero-rest', !en.isIntersecting));
-    }, { threshold: 0 }).observe(heroEl);
-  })();
-  (function loadYTAPI(){
-    if (!heroVideoAllowed()) return;   // poster image stays as the hero background
-    // Defer the heavy YouTube iframe + API until the page has fully loaded and
-    // the main thread is idle. Loading it on the critical path made the first
-    // ~30s feel frozen — the iframe API and video buffering competed with the
-    // user's scrolling and clicking. The poster image covers the hero until the
-    // video is ready, so deferring is invisible except the page is now instantly
-    // interactive on landing.
-    const start = () => {
-      if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
-      const s = document.createElement('script');
-      s.src = 'https://www.youtube.com/iframe_api';
-      s.async = true;
-      document.head.appendChild(s);
-    };
-    const defer = () => ('requestIdleCallback' in window)
-      ? requestIdleCallback(start, { timeout: 4000 })
-      : setTimeout(start, 1500);
-    if (document.readyState === 'complete') defer();
-    else window.addEventListener('load', defer, { once: true });
   })();
 
   // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
