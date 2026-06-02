@@ -96,10 +96,11 @@
     background:linear-gradient(180deg,#000 0%,transparent 22%,transparent 78%,#000 100%);
     pointer-events:none}
   /* breathing red radial glow at the bottom — slow heartbeat */
+  /* static red glow — the breathing opacity animation was dropped: it repainted
+     this full-viewport layer every frame and added to the desktop stalls */
   .hero::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
     background:radial-gradient(ellipse 60% 80% at 50% 120%,rgba(255,45,45,.32),transparent 70%);
-    animation:hero-breathe 6.5s ease-in-out infinite;will-change:opacity}
-  @keyframes hero-breathe{0%,100%{opacity:.55}50%{opacity:.85}}
+    opacity:.7}
   /* keep hero content above the bg/scrim/pulse layers (exclude the bg layers themselves) */
   .hero > *:not(.video-bg):not(.video-scrim){position:relative;z-index:4}
 
@@ -120,7 +121,9 @@
   @media(max-width:700px){.render-template{width:30%;left:3%;top:18%}.render-template-arrow{display:none}}
 
   /* LIVE word pulse — subtle red glow oscillation on the headline */
-  .live-pulse{animation:live-glow 2.8s ease-in-out infinite;will-change:text-shadow}
+  /* static glow — the animated text-shadow keyframes repainted the huge hero
+     headline every frame, the biggest per-frame desktop cost. Now static. */
+  .live-pulse{text-shadow:0 0 45px rgba(255,45,45,.55)}
   @keyframes live-glow{
     0%,100%{text-shadow:0 0 30px rgba(255,45,45,.3)}
     50%{text-shadow:0 0 55px rgba(255,45,45,.75),0 0 90px rgba(255,45,45,.35)}
@@ -1461,6 +1464,15 @@
       }
     });
 
+    // Guard play/pause so scrolling near the hero edge doesn't thrash the
+    // player (repeated play/pause calls each trigger a decode hitch).
+    var setHeroPlaying = function(want){
+      if (!heroReady || !heroPlayer || !heroPlayer.getPlayerState) return;
+      var playing = heroPlayer.getPlayerState() === YT.PlayerState.PLAYING;
+      if (want && !playing) heroPlayer.playVideo();
+      else if (!want && playing) heroPlayer.pauseVideo();
+    };
+
     // Pause the (heavy) hero video whenever it scrolls out of view. A full-screen
     // YouTube iframe decoding continuously keeps the main thread busy, which on
     // mobile makes the steps below feel unclickable and scrolling janky. Pausing
@@ -1470,22 +1482,24 @@
       new IntersectionObserver(entries => {
         entries.forEach(en => {
           heroVisible = en.isIntersecting;
-          if (!heroReady || !heroPlayer) return;
-          if (heroVisible) heroPlayer.playVideo();
-          else heroPlayer.pauseVideo();
+          setHeroPlaying(heroVisible);
         });
       }, { threshold: 0.15 }).observe(heroEl);
     }
   };
-  // Hero video is disabled on ALL devices. A full-screen autoplaying YouTube
-  // iframe decodes continuously and was the main cause of scroll jank; the
-  // high-res poster image set on .video-bg is the hero background instead.
-  // Returning false here also turns on lite-fx below, which freezes the
-  // per-frame hero animations (text-shadow pulse + breathe glow).
+  // Run the live YouTube hero background on capable (non-touch, motion-OK)
+  // screens. It pauses when scrolled offscreen (see IntersectionObserver above).
+  // On small/touch screens and for reduced-motion users we skip the iframe and
+  // let the poster image stand in as the hero background.
   function heroVideoAllowed(){
-    return false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // maxTouchPoints is a hardware fact iOS "Request Desktop Website" can't spoof.
+    const touch = (navigator.maxTouchPoints || 0) > 0
+               || window.matchMedia('(any-pointer:coarse)').matches;
+    const smallOrTouch = window.matchMedia('(max-width:700px)').matches || touch;
+    return !reduce && !smallOrTouch;
   }
-  // lite-fx freezes the expensive per-frame hero animations on every device.
+  // Where the video is skipped, also freeze the per-frame hero animations.
   if (!heroVideoAllowed()) document.documentElement.classList.add('lite-fx');
 
   // Freeze the per-frame hero animations (text-shadow pulse + breathe) whenever
@@ -1505,11 +1519,24 @@
   })();
   (function loadYTAPI(){
     if (!heroVideoAllowed()) return;   // poster image stays as the hero background
-    if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://www.youtube.com/iframe_api';
-    s.async = true;
-    document.head.appendChild(s);
+    // Defer the heavy YouTube iframe + API until the page has fully loaded and
+    // the main thread is idle. Loading it on the critical path made the first
+    // ~30s feel frozen — the iframe API and video buffering competed with the
+    // user's scrolling and clicking. The poster image covers the hero until the
+    // video is ready, so deferring is invisible except the page is now instantly
+    // interactive on landing.
+    const start = () => {
+      if (window.YT && window.YT.Player) { window.onYouTubeIframeAPIReady(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      s.async = true;
+      document.head.appendChild(s);
+    };
+    const defer = () => ('requestIdleCallback' in window)
+      ? requestIdleCallback(start, { timeout: 4000 })
+      : setTimeout(start, 1500);
+    if (document.readyState === 'complete') defer();
+    else window.addEventListener('load', defer, { once: true });
   })();
 
   // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
