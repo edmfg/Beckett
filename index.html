@@ -19,7 +19,9 @@
     --body:'Barlow',sans-serif; --mono:'JetBrains Mono',monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  /* NOTE: no global scroll-behavior:smooth — on macOS it fights the trackpad's
+     momentum scrolling and made this page feel stuck/janky to scroll (while
+     arrow keys worked). Smooth scrolls are requested explicitly in JS instead. */
   body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
   button{font-family:inherit;background:none;border:none;color:inherit;cursor:pointer}
