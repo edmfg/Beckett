@@ -7,6 +7,16 @@ export const config = {
 };
 
 export default function middleware(req) {
+  // Canonical host: bounce the bare .vercel.app production alias to the
+  // public subdomain (catches "/" + every page path, which the vercel.json
+  // redirect's /:path* misses for the bare root). Scoped to that exact host
+  // so nbcu.mfgkessel.com and preview deploys never loop.
+  if ((req.headers.get('host') || '') === 'beckett-psi.vercel.app') {
+    const dest = new URL(req.url);
+    dest.protocol = 'https:';
+    dest.host = 'nbcu.mfgkessel.com';
+    return Response.redirect(dest, 307);
+  }
   const cookie = req.headers.get('cookie') || '';
   if (/(?:^|;\s*)beckett_auth=1(?:;|$)/.test(cookie)) {
     return; // authenticated — let it through
