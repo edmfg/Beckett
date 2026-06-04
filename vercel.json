@@ -1,4 +1,12 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "beckett-psi.vercel.app" }],
+      "destination": "https://nbcu.mfgkessel.com/:path*",
+      "permanent": false
+    }
+  ]
 }
