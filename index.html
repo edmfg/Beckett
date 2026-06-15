@@ -632,11 +632,16 @@
   footer .fl b{color:var(--chalk)}
 
   /* ───────── modal ───────── */
+  /* Closed modals are display:none — NOT opacity:0 — so their contents (the
+     1.7MB PDF <object>, the full-viewport backdrop-filter blur layer) are never
+     rendered or composited while the user is just scrolling the page. They only
+     come alive when opened. This was a major background-CPU / scroll-jank cost. */
   .modal{position:fixed;inset:0;z-index:50;
     background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
-    display:flex;align-items:flex-start;justify-content:center;padding:6vh 4vw;
-    opacity:0;pointer-events:none;transition:opacity .2s;overflow-y:auto}
-  .modal.on{opacity:1;pointer-events:auto}
+    align-items:flex-start;justify-content:center;padding:6vh 4vw;
+    overflow-y:auto;display:none}
+  .modal.on{display:flex;animation:modalIn .2s ease}
+  @keyframes modalIn{from{opacity:0}to{opacity:1}}
   .modal-body{background:#0d0d0f;border:1px solid var(--line);
     max-width:780px;width:100%;padding:42px 44px;position:relative}
   .modal-close{position:absolute;top:14px;right:14px;
@@ -810,7 +815,7 @@
       </div>
       <button class="modal-close" data-close style="position:static;flex-shrink:0">×</button>
     </div>
-    <object class="modal-pdf-embed" data="/assets/first-dibs-moments.pdf" type="application/pdf">
+    <object class="modal-pdf-embed" data-pdf="/assets/first-dibs-moments.pdf" type="application/pdf">
       <div class="modal-pdf-fallback">PDF preview unavailable — <a href="/assets/first-dibs-moments.pdf" target="_blank" style="color:var(--accent)">open in new tab ↗</a></div>
     </object>
   </div>
@@ -1521,7 +1526,16 @@
       btn._bound = true;
       btn.addEventListener('click', () => {
         const m = document.getElementById('modal-' + btn.dataset.open);
-        if (m) { m.classList.add('on'); document.body.style.overflow = 'hidden'; }
+        if (m) {
+          // Lazy-load heavy embeds (the 1.7MB PDF) only the first time the modal
+          // is actually opened — never at page load.
+          m.querySelectorAll('object[data-pdf]').forEach(o => {
+            o.data = o.getAttribute('data-pdf');
+            o.removeAttribute('data-pdf');
+          });
+          m.classList.add('on');
+          document.body.style.overflow = 'hidden';
+        }
       });
     });
   }
