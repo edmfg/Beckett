@@ -1464,19 +1464,38 @@
     // Honor reduced-motion: leave the poster image showing, don't play.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     v.muted = true; // required for autoplay
-    const play = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
-    play();
-    // Pause the decoder when the hero leaves the viewport (poster stays showing),
-    // resume when it scrolls back. An always-decoding full-viewport video pegs the
-    // main thread, which made BOTH scrolling janky and the moment/meme card clicks
-    // feel dead down the page. IntersectionObserver has no per-frame scroll cost,
-    // and unlike the old play/pause-on-scroll-edge it fires once per crossing so it
-    // doesn't thrash the decoder.
+
+    // The hero video is the only continuous main-thread cost on this page. Two
+    // rules keep it from ever fighting the user for the CPU:
+    //   1. inView — only decode while the hero is actually on screen. Once the
+    //      user scrolls down to the Moments/Memes grids the video is PAUSED, so
+    //      it can't starve the card clicks (the poster image stays visible).
+    //   2. ready  — do NOT start decoding on page open. A full-viewport video
+    //      decode competing with the very first scroll is what made the page feel
+    //      frozen the instant it opened. We wait until the page is idle (or the
+    //      user's first interaction) before the first play(). Poster shows
+    //      meanwhile, so the hero never looks empty.
+    let inView = true;   // hero sits at the top — on screen at load
+    let ready  = false;  // flips true once the page has settled
+    const sync = () => {
+      if (ready && inView) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+      else { v.pause(); }
+    };
+
     if ('IntersectionObserver' in window) {
       new IntersectionObserver((entries) => {
-        entries.forEach(e => { e.isIntersecting ? play() : v.pause(); });
+        entries.forEach(e => { inView = e.isIntersecting; });
+        sync();
       }, { threshold: 0.01 }).observe(v);
     }
+
+    const start = () => { if (ready) return; ready = true; sync(); };
+    const onIdle = window.requestIdleCallback || (cb => setTimeout(cb, 800));
+    if (document.readyState === 'complete') onIdle(start);
+    else window.addEventListener('load', () => onIdle(start), { once: true });
+    // …or as soon as the user interacts, whichever comes first.
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev =>
+      window.addEventListener(ev, start, { once: true, passive: true }));
   })();
 
   // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
