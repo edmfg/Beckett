@@ -303,7 +303,11 @@
   /* Skip rendering off-screen sections while scrolling (big win on this tall
      page). contain-intrinsic-size:auto remembers each section's real height
      after first render, so the scrollbar stays stable — no jump. */
-  .why-panel,#step-1,#step-2{content-visibility:auto;contain-intrinsic-size:auto 800px}
+  .why-panel{content-visibility:auto;contain-intrinsic-size:auto 800px}
+  /* #step-1/#step-2 deliberately NOT content-visibility:auto — the render-skip
+     burst on scroll-in caused jank (and the 800px size guess made the scrollbar
+     jump), and skipped subtrees don't reliably hit-test, so moment/meme card
+     clicks were being dropped. These two sections are interactive — keep them live. */
   .s-head{display:flex;align-items:baseline;gap:24px;margin-bottom:8px;flex-wrap:wrap}
   .s-num{font-family:var(--display);font-size:clamp(48px,7vw,100px);
     line-height:.9;color:var(--accent);letter-spacing:.02em}
@@ -676,7 +680,7 @@
 <!-- ───────── HERO ───────── -->
 <div class="hero">
   <div class="video-bg" aria-hidden="true">
-    <video id="hero-video" muted loop playsinline preload="auto"
+    <video id="hero-video" muted loop playsinline preload="metadata"
            poster="https://i.ytimg.com/vi/ij8JB47XbZA/maxresdefault.jpg">
       <source src="/assets/hero-loop.mp4" type="video/mp4">
     </video>
@@ -1460,11 +1464,19 @@
     // Honor reduced-motion: leave the poster image showing, don't play.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     v.muted = true; // required for autoplay
-    const p = v.play(); if (p && p.catch) p.catch(() => {});
-    // NOTE: deliberately NOT pausing/playing on scroll. Toggling play()/pause()
-    // as the hero crossed the viewport edge spiked the decoder and froze the
-    // page mid-scroll. The clip is small/low-res, so just letting it loop
-    // continuously is cheaper than the decode restarts.
+    const play = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    play();
+    // Pause the decoder when the hero leaves the viewport (poster stays showing),
+    // resume when it scrolls back. An always-decoding full-viewport video pegs the
+    // main thread, which made BOTH scrolling janky and the moment/meme card clicks
+    // feel dead down the page. IntersectionObserver has no per-frame scroll cost,
+    // and unlike the old play/pause-on-scroll-edge it fires once per crossing so it
+    // doesn't thrash the decoder.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        entries.forEach(e => { e.isIntersecting ? play() : v.pause(); });
+      }, { threshold: 0.01 }).observe(v);
+    }
   })();
 
   // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
