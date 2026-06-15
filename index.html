@@ -705,7 +705,7 @@
 <!-- ───────── HERO ───────── -->
 <div class="hero">
   <div class="video-bg" aria-hidden="true">
-    <video id="hero-video" muted loop playsinline preload="metadata"
+    <video id="hero-video" muted loop playsinline preload="none"
            poster="https://i.ytimg.com/vi/ij8JB47XbZA/maxresdefault.jpg">
       <source src="/assets/hero-loop.mp4" type="video/mp4">
     </video>
@@ -993,12 +993,12 @@
     if (!pre) return;
     document.body.style.overflow = 'hidden'; // hold scroll while loading
 
+    // Only the content the user touches first — the moment + meme thumbnails —
+    // gates the loading screen, so it lifts fast. The heavier storyboard frames
+    // (~1.8MB, step-3 only) warm quietly in the background after reveal.
     const urls = [
       ...MOMENTS.map(m => `/images/moments/${m.id}.jpg`),
       ...MEMES.map(m => `/images/memes/${m.id}.jpg`),
-      '/images/frames/couch.jpg', '/images/frames/selfie.jpg',
-      '/images/frames/render.jpg', '/images/frames/chat.jpg',
-      '/assets/gemini-logo.png', '/assets/nbcsn-cfb-logo.png',
     ];
     const total = urls.length;
     let done = 0;
@@ -1025,6 +1025,16 @@
       pre.classList.add('done');
       document.body.style.overflow = '';
       setTimeout(() => pre.remove(), 600);
+
+      // Page is usable now. Warm the rest in the background so it's ready when
+      // needed, WITHOUT blocking interaction: storyboard frames first…
+      ['couch', 'selfie', 'render', 'chat'].forEach(f => {
+        const i = new Image(); i.src = `/images/frames/${f}.jpg`;
+      });
+      // …then start the hero video, but only after the page has settled (idle),
+      // never during the user's first interactions.
+      const onIdle = window.requestIdleCallback || (cb => setTimeout(cb, 1));
+      setTimeout(() => onIdle(() => { if (window.startHeroVideo) window.startHeroVideo(); }), 2500);
     };
 
     const cap = setTimeout(reveal, 7000); // never trap the user
@@ -1536,44 +1546,33 @@
   // they scroll the document, not the element under the cursor) and its
   // buffering caused the load stalls. A native <video> has neither problem and
   // loops seamlessly with far less main-thread cost.
+  // Hero video — loaded LAZILY (preload="none") and never on the user's first
+  // interaction. The preloader calls window.startHeroVideo() a couple of seconds
+  // after the page is usable, when the main thread is idle, so the fetch + decode
+  // never competes with the first scroll/click. Poster shows until then, and the
+  // video pauses whenever the hero is off-screen so it can't starve the grids.
   (function heroVideo(){
     const v = document.getElementById('hero-video');
     if (!v) return;
-    // Honor reduced-motion: leave the poster image showing, don't play.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    v.muted = true; // required for autoplay
-
-    // The hero video is the only continuous main-thread cost on this page. Two
-    // rules keep it from ever fighting the user for the CPU:
-    //   1. inView — only decode while the hero is actually on screen. Once the
-    //      user scrolls down to the Moments/Memes grids the video is PAUSED, so
-    //      it can't starve the card clicks (the poster image stays visible).
-    //   2. ready  — do NOT start decoding on page open. A full-viewport video
-    //      decode competing with the very first scroll is what made the page feel
-    //      frozen the instant it opened. We wait until the page is idle (or the
-    //      user's first interaction) before the first play(). Poster shows
-    //      meanwhile, so the hero never looks empty.
-    let inView = true;   // hero sits at the top — on screen at load
-    let ready  = false;  // flips true once the page has settled
+    v.muted = true;
+    let inView = true, started = false;
     const sync = () => {
-      if (ready && inView) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+      if (started && inView) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
       else { v.pause(); }
     };
-
     if ('IntersectionObserver' in window) {
       new IntersectionObserver((entries) => {
         entries.forEach(e => { inView = e.isIntersecting; });
         sync();
       }, { threshold: 0.01 }).observe(v);
     }
-
-    const start = () => { if (ready) return; ready = true; sync(); };
-    const onIdle = window.requestIdleCallback || (cb => setTimeout(cb, 800));
-    if (document.readyState === 'complete') onIdle(start);
-    else window.addEventListener('load', () => onIdle(start), { once: true });
-    // …or as soon as the user interacts, whichever comes first.
-    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev =>
-      window.addEventListener(ev, start, { once: true, passive: true }));
+    window.startHeroVideo = () => {
+      if (started) return;
+      started = true;
+      v.load();   // preload="none" means the clip isn't fetched until now
+      sync();
+    };
   })();
 
   // Beckett tooltip — tap-to-toggle for touch devices (hover still works on desktop)
