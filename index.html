@@ -26,6 +26,23 @@
   a{color:inherit;text-decoration:none}
   button{font-family:inherit;background:none;border:none;color:inherit;cursor:pointer}
 
+  /* ───────── preloader ───────── */
+  #preloader{position:fixed;inset:0;z-index:200;background:#0d0d0f;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:26px;text-align:center;padding:0 24px;
+    transition:opacity .5s ease;will-change:opacity}
+  #preloader.done{opacity:0;pointer-events:none}
+  #preloader .pl-kick{font-family:var(--cond);font-weight:700;font-size:13px;
+    letter-spacing:.4em;text-transform:uppercase;color:var(--accent)}
+  #preloader .pl-title{font-family:var(--display);font-size:clamp(56px,12vw,140px);
+    line-height:.9;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);
+    text-shadow:0 0 60px rgba(255,45,45,.3)}
+  #preloader .pl-bar{width:min(320px,70vw);height:3px;background:var(--line);
+    overflow:hidden;border-radius:2px}
+  #preloader .pl-fill{height:100%;width:0;background:var(--accent);transition:width .25s ease}
+  #preloader .pl-pct{font-family:var(--cond);font-weight:600;font-size:12px;
+    letter-spacing:.28em;text-transform:uppercase;color:var(--mute)}
+
   /* ───────── topbar (in flow, sits above hero) ───────── */
   /* ───────── pre-produced notice banner (top of page) ───────── */
   .notice-banner{position:relative;z-index:6;
@@ -664,6 +681,14 @@
 </head>
 <body>
 
+<!-- ───────── PRELOADER — decode critical images before the user interacts ───────── -->
+<div id="preloader">
+  <div class="pl-kick">Gemini × NBCU</div>
+  <div class="pl-title">Beckett</div>
+  <div class="pl-bar"><div class="pl-fill" id="pl-fill"></div></div>
+  <div class="pl-pct" id="pl-pct">Loading…</div>
+</div>
+
 <header class="topbar">
   <div class="brand">
     <img class="brand-gemini" src="/assets/gemini-logo.png" alt="Gemini">
@@ -952,6 +977,59 @@
   let pickedMoment = null;
   let pickedMeme   = null;
   let renderTimer  = null;
+
+  // ────────────────────────────────────────────────────────
+  // PRELOADER
+  // ────────────────────────────────────────────────────────
+  // Decode the thumbnails + storyboard frames up front behind a branded screen,
+  // so once the user starts interacting there are NO decode bursts — scrolling
+  // into the Moments/Memes grids and firing the reveal are instant. The per-combo
+  // ad image (~1MB each, 100+ of them) is NOT preloaded — that still streams on
+  // selection. Hard 7s cap so a slow/missing asset can never trap the user.
+  (function preload(){
+    const pre  = document.getElementById('preloader');
+    const fill = document.getElementById('pl-fill');
+    const pct  = document.getElementById('pl-pct');
+    if (!pre) return;
+    document.body.style.overflow = 'hidden'; // hold scroll while loading
+
+    const urls = [
+      ...MOMENTS.map(m => `/images/moments/${m.id}.jpg`),
+      ...MEMES.map(m => `/images/memes/${m.id}.jpg`),
+      '/images/frames/couch.jpg', '/images/frames/selfie.jpg',
+      '/images/frames/render.jpg', '/images/frames/chat.jpg',
+      '/assets/gemini-logo.png', '/assets/nbcsn-cfb-logo.png',
+    ];
+    const total = urls.length;
+    let done = 0;
+    const bump = () => {
+      done++;
+      const p = Math.round(done / total * 100);
+      if (fill) fill.style.width = p + '%';
+      if (pct)  pct.textContent = `Loading… ${p}%`;
+    };
+    // load + actually DECODE each image (decode() forces the raster work now,
+    // off the interaction path), then count it toward progress either way.
+    const one = (src) => new Promise(res => {
+      const img = new Image();
+      const fin = () => res();
+      img.onload  = () => { (img.decode ? img.decode() : Promise.resolve()).catch(()=>{}).then(fin); };
+      img.onerror = fin;
+      img.src = src;
+    }).then(bump);
+
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      pre.classList.add('done');
+      document.body.style.overflow = '';
+      setTimeout(() => pre.remove(), 600);
+    };
+
+    const cap = setTimeout(reveal, 7000); // never trap the user
+    Promise.all(urls.map(one)).then(() => { clearTimeout(cap); reveal(); });
+  })();
 
   // ────────────────────────────────────────────────────────
   // RENDER GRIDS
